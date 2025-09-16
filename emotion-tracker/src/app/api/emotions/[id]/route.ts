@@ -1,0 +1,57 @@
+import { NextRequest, NextResponse } from "next/server";
+import { adminAuth, adminDb } from "@/lib/firebaseAdmin";
+
+export async function PUT(
+  req: NextRequest,
+  { params }: { params: { id: string } },
+) {
+  try {
+    const { token, ...updateData } = await req.json();
+    const decoded = await adminAuth.verifyIdToken(token);
+
+    const docRef = adminDb.collection("emotions").doc(params.id);
+    const doc = await docRef.get();
+
+    if (!doc.exists) {
+      return NextResponse.json({ error: "Not found" }, { status: 404 });
+    }
+
+    if (doc.data()?.uid !== decoded.uid) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    await docRef.update(updateData);
+    return NextResponse.json({ ok: true });
+  } catch (err: any) {
+    return NextResponse.json({ error: err.message }, { status: 400 });
+  }
+}
+
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: { id: string } },
+) {
+  try {
+    const token = req.headers.get("authorization")?.split("Bearer ")[1];
+    if (!token)
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    const decoded = await adminAuth.verifyIdToken(token);
+
+    const docRef = adminDb.collection("emotions").doc(params.id);
+    const doc = await docRef.get();
+
+    if (!doc.exists) {
+      return NextResponse.json({ error: "Not found" }, { status: 404 });
+    }
+
+    if (doc.data()?.uid !== decoded.uid) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    await docRef.delete();
+    return NextResponse.json({ ok: true });
+  } catch (err: any) {
+    return NextResponse.json({ error: err.message }, { status: 400 });
+  }
+}
