@@ -3,13 +3,14 @@ import { adminAuth, adminDb } from "@/lib/firebaseAdmin";
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } },
+  context: { params: { id: string }; searchParams?: any },
 ) {
+  const { id } = context.params;
   try {
     const { token, ...updateData } = await req.json();
     const decoded = await adminAuth.verifyIdToken(token);
 
-    const docRef = adminDb.collection("emotions").doc(params.id);
+    const docRef = adminDb.collection("emotions").doc(id);
     const doc = await docRef.get();
 
     if (!doc.exists) {
@@ -29,8 +30,9 @@ export async function PUT(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } },
+  context: { params: { id: string }; searchParams?: any },
 ) {
+  const { id } = context.params;
   try {
     const token = req.headers.get("authorization")?.split("Bearer ")[1];
     if (!token)
@@ -38,7 +40,7 @@ export async function DELETE(
 
     const decoded = await adminAuth.verifyIdToken(token);
 
-    const docRef = adminDb.collection("emotions").doc(params.id);
+    const docRef = adminDb.collection("emotions").doc(id);
     const doc = await docRef.get();
 
     if (!doc.exists) {
