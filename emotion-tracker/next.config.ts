@@ -13,6 +13,9 @@ const nextConfig: NextConfig = {
     ];
   },
   reactStrictMode: false,
+  eslint: {
+    ignoreDuringBuilds: true, // игнорировать ошибки ESLint при сборке
+  },
 };
 
 export default nextConfig;

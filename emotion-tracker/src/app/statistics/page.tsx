@@ -168,7 +168,7 @@ export default function Statistics() {
               sortedPieChartData={sortedPieChartData}
             />
 
-            <Card onClick={AskAI} className="w-full border-none">
+            {/* <Card onClick={AskAI} className="w-full border-none">
               <CardContent className="text-center">
                 {slogonQuery.isFetching ? (
                   <div className="flex h-full w-full flex-col items-center justify-center rounded-md !shadow-none">
@@ -182,7 +182,7 @@ export default function Statistics() {
                   </i>
                 )}
               </CardContent>
-            </Card>
+            </Card> */}
           </>
         )}
       </Tabs>
