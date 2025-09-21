@@ -3,9 +3,9 @@ import { adminAuth, adminDb } from "@/lib/firebaseAdmin";
 
 export async function PUT(
   req: NextRequest,
-  context: { params: { id: string }; searchParams?: any },
+  context: { params: Promise<{ id: string }> },
 ) {
-  const { id } = context.params;
+  const { id } = await context.params;
   try {
     const { token, ...updateData } = await req.json();
     const decoded = await adminAuth.verifyIdToken(token);
@@ -30,9 +30,9 @@ export async function PUT(
 
 export async function DELETE(
   req: NextRequest,
-  context: { params: { id: string }; searchParams?: any },
+  context: { params: Promise<{ id: string }> },
 ) {
-  const { id } = context.params;
+  const { id } = await context.params;
   try {
     const token = req.headers.get("authorization")?.split("Bearer ")[1];
     if (!token)
