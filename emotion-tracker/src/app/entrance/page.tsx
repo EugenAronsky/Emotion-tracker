@@ -12,7 +12,7 @@ export default function GoogleSignInButton() {
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
-      if (user) router.replace("/"); // если авторизован → на главную
+      if (user) router.replace("/dashboard"); // если авторизован → на главную
     });
 
     return () => unsubscribe();
@@ -21,9 +21,8 @@ export default function GoogleSignInButton() {
   const handleGoogleSignIn = async () => {
     try {
       const result = await signInWithPopup(auth, googleProvider);
-      const user = result.user;
       const token = await result.user.getIdToken();
-      console.log("User info:", user);
+      // const user = result.user;
 
       // Отправляем токен на API route для HttpOnly cookie
       await fetch("/api/set-token", {
@@ -31,6 +30,9 @@ export default function GoogleSignInButton() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token }),
       });
+
+      if (document.referrer.includes("http://localhost:3000")) router.back();
+      else router.push("/dashboard");
     } catch (error: any) {
       console.error(error);
       alert(error.message);
@@ -52,7 +54,7 @@ export default function GoogleSignInButton() {
             alt=""
             width={20}
             height={20}
-            className="size-5"
+            className="size-5 dark:invert"
           />
           Continue with Google
         </Button>

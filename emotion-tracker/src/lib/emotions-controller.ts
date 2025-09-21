@@ -1,11 +1,10 @@
 import { auth } from "@/lib/firebase";
 import { EmotionForm } from "./type";
-import { useFirebaseUser } from "@/hooks/useFirebaseUser";
-import { User } from "firebase/auth";
 
 // Создать эмоцию
-async function createEmotion(data: EmotionForm & { date?: Date }) {
+async function createEmotion(data: EmotionForm & { date?: Date | undefined }) {
   const token = await auth.currentUser?.getIdToken();
+  if (!token) throw new Error("Not authenticated");
   const res = await fetch("/api/emotions", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -29,6 +28,24 @@ async function getEmotions() {
   return res.json();
 }
 
+// Получить эмоции по дате
+async function getEmotionsByRange(fromDate?: number | undefined) {
+  const token = await auth.currentUser?.getIdToken();
+  if (!token) throw new Error("Not authenticated");
+  //   const token = await user.getIdToken(); // ✅ гарантированно не undefined
+  const SearchParams = fromDate
+    ? new URLSearchParams({ fromDate: fromDate.toString() })
+    : "";
+
+  const res = await fetch(`/api/emotions?${SearchParams.toString()}`, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return res.json();
+}
+
 // Обновить эмоцию
 async function updateEmotion({
   id,
@@ -38,6 +55,7 @@ async function updateEmotion({
   updates: Partial<EmotionForm>;
 }) {
   const token = await auth.currentUser?.getIdToken();
+  if (!token) throw new Error("Not authenticated");
   const res = await fetch(`/api/emotions/${id}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
@@ -49,10 +67,17 @@ async function updateEmotion({
 // Удалить эмоцию
 async function deleteEmotion(id: string) {
   const token = await auth.currentUser?.getIdToken();
+  if (!token) throw new Error("Not authenticated");
   await fetch(`/api/emotions/${id}`, {
     method: "DELETE",
     headers: { Authorization: `Bearer ${token}` },
   });
 }
 
-export { createEmotion, getEmotions, updateEmotion, deleteEmotion };
+export {
+  createEmotion,
+  deleteEmotion,
+  getEmotions,
+  getEmotionsByRange,
+  updateEmotion,
+};

@@ -76,16 +76,24 @@ export function EmotionDialog({
 
   return (
     <Dialog
-      open={updateMutation.isPending || createMutation.isPending ? true : open}
+      open={
+        deleteMutation.isPending ||
+        updateMutation.isPending ||
+        createMutation.isPending
+          ? true
+          : open
+      }
       onOpenChange={setOpen}
     >
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="overflow-hidden sm:max-w-[425px]">
         <div
           className={cn(
             "absolute top-0 left-0 z-50 flex h-full w-full items-center justify-center bg-white/70 transition-all",
-            updateMutation.isPending || createMutation.isPending
-              ? "visible bg-white/70"
+            deleteMutation.isPending ||
+              updateMutation.isPending ||
+              createMutation.isPending
+              ? "bg-secondary/60 visible"
               : "invisible",
           )}
         >
@@ -104,7 +112,7 @@ export function EmotionDialog({
               <RadioGroup
                 {...field}
                 onValueChange={field.onChange}
-                className="flex gap-3 *:flex *:size-14 *:items-center *:justify-center *:rounded-full *:bg-slate-100"
+                className="*:bg-secondary flex gap-3 *:flex *:size-14 *:items-center *:justify-center *:rounded-full"
               >
                 <Label
                   className={cn(
@@ -208,6 +216,7 @@ export function EmotionDialog({
                 variant="destructive"
                 className="!grow-0"
                 size={"icon"}
+                type="button"
               >
                 <Trash2 />
               </Button>
@@ -216,6 +225,7 @@ export function EmotionDialog({
               <Button
                 onClick={() => setTimeout(() => reset(defaultValues), 200)}
                 variant="outline"
+                type="button"
               >
                 <Eraser /> Cancel
               </Button>
