@@ -1,5 +1,5 @@
-import Dashboard from "@/app/dashboard/page";
-import Statistics from "@/app/statistics/page";
+import Dashboard from "@/app/dashboard/ui/dashboard";
+import Statistics from "@/app/statistics/ui/statistics";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
