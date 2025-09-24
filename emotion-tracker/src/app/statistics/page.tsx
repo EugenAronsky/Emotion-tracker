@@ -1,23 +1,18 @@
 "use client";
 import NavWrapper from "@/components/blocks/nav-wrapper";
-import { Card, CardContent } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useEmotions } from "@/hooks/useEmotions";
 import { useFirebaseUser } from "@/hooks/useFirebaseUser";
-import { Emotion } from "@/lib/enums";
-import { EmotionReturnProps } from "@/lib/type";
-import { cn } from "@/lib/utils";
-import { useQueryClient } from "@tanstack/react-query";
-import { useEffect, useRef, useState } from "react";
-import { PuffLoader, ScaleLoader } from "react-spinners";
-import Wave from "react-wavify";
-import { Cell, Pie, PieChart } from "recharts";
-import WeekTab from "./ui/week-tab";
-import MonthTab from "./ui/month-tab";
-import YearTab from "./ui/year-tab";
-import { Button } from "@/components/ui/button";
-import { getAiTip } from "@/lib/gemini-controller";
 import { useGemini } from "@/hooks/useGemini";
+import { Emotion } from "@/lib/enums";
+import { EmotionReturnProps, SenderInfo } from "@/lib/type";
+import { useQueryClient } from "@tanstack/react-query";
+import { useEffect, useMemo, useState } from "react";
+import { PuffLoader } from "react-spinners";
+import MonthTab from "./ui/month-tab";
+import WeekTab from "./ui/week-tab";
+import YearTab from "./ui/year-tab";
+import { VenetianMask } from "lucide-react";
 
 export type TabProps = {
   sortedPieChartData: {
@@ -30,35 +25,49 @@ export type TabProps = {
   }[];
 };
 
-export default function Statistics() {
-  const queryClient = useQueryClient();
+export default function Statistics({
+  senderInfo,
+}: {
+  senderInfo?: SenderInfo["senderInfo"];
+}) {
+  const defaultFromDate = useMemo(() => {
+    const date = new Date();
+    const day = date.getDay();
+    date.setHours(0, 0, 0, 0);
+    return date.setDate(date.getDate() - day + (day === 0 ? -6 : 1));
+  }, []);
   const { loading } = useFirebaseUser();
-  const [fromDate, setFromDate] = useState<number>();
+  const [fromDate, setFromDate] = useState<number>(defaultFromDate);
   const [slogan, setSlogan] = useState<string | undefined>();
   const [pieChartData, setPieChartData] = useState<
     Array<{ name: string; value: number }>
   >([]);
 
-  const { emotionsByRangeQuery } = useEmotions({
-    emotionsQueryParams: {
+  const { emotionsByRangeQuery, emotionsByUserIdAndByRangeQuery } = useEmotions(
+    {
       fromDate: fromDate,
+      user_id: senderInfo?.uid,
     },
-  });
+  );
+
+  const query = Boolean(senderInfo)
+    ? emotionsByUserIdAndByRangeQuery
+    : emotionsByRangeQuery;
 
   const sortedPieChartData = structuredClone(pieChartData).sort((a, b) =>
     b.value > a.value ? 1 : -1,
   );
 
-  const { slogonQuery } = useGemini({
-    slogonQueryParams: {
-      emotion: sortedPieChartData.at(0)?.name || "",
-      prev_context: slogan,
-    },
-  });
+  // const { slogonQuery } = useGemini({
+  //   slogonQueryParams: {
+  //     emotion: sortedPieChartData.at(0)?.name || "",
+  //     prev_context: slogan,
+  //   },
+  // });
 
   useEffect(() => {
-    if (emotionsByRangeQuery.isSuccess) {
-      const res = emotionsByRangeQuery.data?.reduce(
+    if (query.isSuccess) {
+      const res = query.data?.reduce(
         (
           acc: Array<{
             name: string;
@@ -80,7 +89,7 @@ export default function Statistics() {
       );
       Boolean(res?.length) && setPieChartData(res);
     }
-  }, [emotionsByRangeQuery.data]);
+  }, [query.data]);
 
   const tabsChangeHandler = (volume: "week" | "month" | "year" | string) => {
     switch (volume) {
@@ -112,29 +121,23 @@ export default function Statistics() {
     }
   };
 
-  useEffect(() => {
-    queryClient.refetchQueries({ queryKey: ["emotions-range"] }); // рефетч
-  }, [fromDate]);
+  // useEffect(() => {
+  //   Boolean(senderInfo)
+  //     ? queryClient.refetchQueries({
+  //         queryKey: ["emotions-range-by-user-id", senderInfo?.uid],
+  //       })
+  //     : queryClient.refetchQueries({ queryKey: ["emotions-range"] });
+  // }, [fromDate]);
 
-  useEffect(() => {
-    if (!slogonQuery.data) slogonQuery.refetch();
-    else setSlogan(slogonQuery.data.slogon);
-  }, [slogonQuery.data]);
+  // useEffect(() => {
+  //   if (!slogonQuery.data) slogonQuery.refetch();
+  //   else setSlogan(slogonQuery.data.slogon);
+  // }, [slogonQuery.data]);
 
-  useEffect(() => {
-    setFromDate(
-      new Date().setDate(
-        new Date().getDate() -
-          new Date().getDay() +
-          (new Date().getDay() === 0 ? -6 : 1),
-      ),
-    );
-  }, []);
-
-  const AskAI = () => !slogonQuery.isFetching && slogonQuery.refetch();
+  // const AskAI = () => !slogonQuery.isFetching && slogonQuery.refetch();
 
   return (
-    <NavWrapper>
+    <NavWrapper hidden={Boolean(senderInfo)}>
       <Tabs
         defaultValue="week"
         onValueChange={tabsChangeHandler}
@@ -146,11 +149,11 @@ export default function Statistics() {
           <TabsTrigger value="year">Year</TabsTrigger>
         </TabsList>
 
-        {emotionsByRangeQuery.isFetching || loading ? (
+        {query.isLoading || loading ? (
           <div className="flex h-full w-full flex-col items-center justify-center rounded-md !shadow-none">
             <PuffLoader size={160} color="#3b82f6" />
           </div>
-        ) : (
+        ) : query.data?.length ? (
           <>
             <WeekTab
               id="week"
@@ -184,6 +187,11 @@ export default function Statistics() {
               </CardContent>
             </Card> */}
           </>
+        ) : (
+          <div className="flex grow flex-col items-center justify-center opacity-60">
+            <VenetianMask size={120} className="stroke-1" />
+            There is no statistics for now
+          </div>
         )}
       </Tabs>
     </NavWrapper>

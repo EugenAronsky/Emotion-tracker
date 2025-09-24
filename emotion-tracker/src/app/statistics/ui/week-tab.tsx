@@ -118,13 +118,17 @@ export default function WeekTab({
 
             <div className="mt-2 flex w-full flex-col overflow-hidden rounded-md">
               {sortedPieChartData.map((entry, index) => {
-                const intensity = Number(
-                  (
-                    (entry.value /
-                      pieChartData.reduce((acc, curr) => acc + curr.value, 0)) *
-                    100
-                  ).toFixed(1),
-                );
+                const intensity =
+                  Number(
+                    (
+                      (entry.value /
+                        pieChartData.reduce(
+                          (acc, curr) => acc + curr.value,
+                          0,
+                        )) *
+                      100
+                    ).toFixed(1),
+                  ) || 0;
 
                 index === 0 && (maxIntensity.current = intensity);
 

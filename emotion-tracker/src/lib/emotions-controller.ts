@@ -1,5 +1,6 @@
 import { auth } from "@/lib/firebase";
 import { EmotionForm } from "./type";
+import { errorHandler } from "./func";
 
 // Создать эмоцию
 async function createEmotion(data: EmotionForm & { date?: Date | undefined }) {
@@ -10,8 +11,7 @@ async function createEmotion(data: EmotionForm & { date?: Date | undefined }) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ token, ...data }),
   });
-
-  return res;
+  return errorHandler(res);
 }
 
 // Получить эмоции
@@ -25,7 +25,20 @@ async function getEmotions() {
       Authorization: `Bearer ${token}`,
     },
   });
-  return res.json();
+  return errorHandler(res);
+}
+
+async function getEmotionsByUserId(user_id?: string | undefined) {
+  const token = await auth.currentUser?.getIdToken();
+  if (!token) throw new Error("Not authenticated");
+  //   const token = await user.getIdToken(); // ✅ гарантированно не undefined
+  const res = await fetch(`/api/collaborators/emotions/${user_id}`, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return errorHandler(res);
 }
 
 // Получить эмоции по дате
@@ -43,7 +56,30 @@ async function getEmotionsByRange(fromDate?: number | undefined) {
       Authorization: `Bearer ${token}`,
     },
   });
-  return res.json();
+  return errorHandler(res);
+}
+
+async function getEmotionsByUserIdAndByRange(
+  user_id?: string | undefined,
+  fromDate?: number | undefined,
+) {
+  const token = await auth.currentUser?.getIdToken();
+  if (!token) throw new Error("Not authenticated");
+  //   const token = await user.getIdToken(); // ✅ гарантированно не undefined
+  const SearchParams = fromDate
+    ? new URLSearchParams({ fromDate: fromDate.toString() })
+    : "";
+
+  const res = await fetch(
+    `/api/collaborators/emotions/${user_id}?${SearchParams.toString()}`,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+  return errorHandler(res);
 }
 
 // Обновить эмоцию
@@ -61,23 +97,26 @@ async function updateEmotion({
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ token, ...updates }),
   });
-  return res;
+  return errorHandler(res);
 }
 
 // Удалить эмоцию
 async function deleteEmotion(id: string) {
   const token = await auth.currentUser?.getIdToken();
   if (!token) throw new Error("Not authenticated");
-  await fetch(`/api/emotions/${id}`, {
+  const res = await fetch(`/api/emotions/${id}`, {
     method: "DELETE",
     headers: { Authorization: `Bearer ${token}` },
   });
+  return errorHandler(res);
 }
 
 export {
+  getEmotions,
   createEmotion,
   deleteEmotion,
-  getEmotions,
-  getEmotionsByRange,
   updateEmotion,
+  getEmotionsByRange,
+  getEmotionsByUserId,
+  getEmotionsByUserIdAndByRange,
 };

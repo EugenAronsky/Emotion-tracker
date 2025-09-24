@@ -16,6 +16,9 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true, // игнорировать ошибки ESLint при сборке
   },
+  images: {
+    remotePatterns: [new URL("https://lh3.googleusercontent.com/**")],
+  },
 };
 
 export default nextConfig;

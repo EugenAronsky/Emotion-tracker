@@ -3,16 +3,19 @@ import {
   deleteEmotion,
   getEmotions,
   getEmotionsByRange,
+  getEmotionsByUserId,
+  getEmotionsByUserIdAndByRange,
   updateEmotion,
 } from "@/lib/emotions-controller";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useFirebaseUser } from "./useFirebaseUser";
 
 export function useEmotions(options?: {
-  emotionsQueryParams: { fromDate?: number | undefined };
+  user_id?: string | undefined;
+  fromDate?: number | undefined;
 }) {
   const queryClient = useQueryClient();
-  const { user, loading } = useFirebaseUser();
+  const { user } = useFirebaseUser();
 
   const emotionsQuery = useQuery({
     queryKey: ["emotions"],
@@ -23,11 +26,33 @@ export function useEmotions(options?: {
   });
 
   const emotionsByRangeQuery = useQuery({
-    queryKey: ["emotions-range"],
-    queryFn: () => getEmotionsByRange(options?.emotionsQueryParams.fromDate),
+    queryKey: ["emotions-range", options?.fromDate],
+    queryFn: () => getEmotionsByRange(options?.fromDate),
     refetchOnWindowFocus: false,
     staleTime: 1000 * 360,
-    enabled: !!user?.uid, // только если пользователь авторизован
+    enabled: !!user?.uid && !!options?.fromDate, // только если пользователь авторизован
+  });
+
+  const emotionsByUserIdQuery = useQuery({
+    queryKey: ["emotions-by-user-id", options?.user_id],
+    queryFn: () => getEmotionsByUserId(options?.user_id),
+
+    staleTime: 1000 * 60,
+    refetchOnWindowFocus: false,
+    enabled: !!user?.uid && !!options?.user_id, // только если пользователь авторизован
+  });
+
+  const emotionsByUserIdAndByRangeQuery = useQuery({
+    queryKey: [
+      "emotions-range-by-user-id",
+      options?.user_id,
+      options?.fromDate,
+    ],
+    queryFn: () =>
+      getEmotionsByUserIdAndByRange(options?.user_id, options?.fromDate),
+    refetchOnWindowFocus: false,
+    staleTime: 1000 * 360,
+    enabled: !!user?.uid && !!options?.user_id && !!options?.fromDate, // только если пользователь авторизован
   });
 
   const createMutation = useMutation({
@@ -59,6 +84,8 @@ export function useEmotions(options?: {
     createMutation,
     updateMutation,
     deleteMutation,
+    emotionsByUserIdQuery,
     emotionsByRangeQuery,
+    emotionsByUserIdAndByRangeQuery,
   };
 }

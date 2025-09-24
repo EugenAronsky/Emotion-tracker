@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useEmotions } from "@/hooks/useEmotions";
 import { useFirebaseUser } from "@/hooks/useFirebaseUser";
 import { Emotion } from "@/lib/enums";
-import { EmotionReturnProps } from "@/lib/type";
+import { EmotionReturnProps, SenderInfo } from "@/lib/type";
 import { cn } from "@/lib/utils";
 import { Sticker } from "lucide-react";
 import moment from "moment";
@@ -14,18 +14,26 @@ import React, { useEffect } from "react";
 import { PuffLoader } from "react-spinners";
 import Wave from "react-wavify";
 
-export default function Dashboard() {
-  const { emotionsQuery } = useEmotions();
+export default function Dashboard({
+  senderInfo,
+}: {
+  senderInfo?: SenderInfo["senderInfo"];
+}) {
+  const { emotionsQuery, emotionsByUserIdQuery } = useEmotions({
+    user_id: senderInfo?.uid,
+  });
   const { loading } = useFirebaseUser();
   const [date, setDate] = React.useState<Date | undefined>(new Date());
   const [defaultData, setDefaultData] = React.useState<
     EmotionReturnProps | undefined
   >();
 
+  const query = Boolean(senderInfo) ? emotionsByUserIdQuery : emotionsQuery;
+
   useEffect(() => {
     setDefaultData(
-      date !== undefined && emotionsQuery.data !== undefined
-        ? emotionsQuery.data
+      date !== undefined && query.data !== undefined
+        ? query.data
             .filter(
               (e: any) =>
                 moment(new Date(e.date)).format("MMM Do YY") ===
@@ -34,18 +42,19 @@ export default function Dashboard() {
             .at(0)
         : undefined,
     );
-  }, [emotionsQuery]);
+  }, [query]);
 
   return (
-    <NavWrapper>
+    <NavWrapper hidden={Boolean(senderInfo)}>
       <div className="flex h-full w-full flex-col items-center justify-start gap-6 *:border-none *:shadow-[0_3px_6px_0_#00000010]">
-        {emotionsQuery.isFetching || loading ? (
+        {query.isFetching || loading ? (
           <div className="flex h-full w-full flex-col items-center justify-center rounded-md !shadow-none">
             <PuffLoader size={160} color="#3b82f6" />
           </div>
         ) : (
           <>
             <Calendar
+              defaultMonth={new Date(date || new Date())}
               fixedWeeks
               mode="single"
               selected={date}
@@ -61,7 +70,7 @@ export default function Dashboard() {
               disabled={{ after: new Date() }}
               components={{
                 DayButton: (props) => {
-                  const dayEmotion = emotionsQuery.data?.find(
+                  const dayEmotion = query.data?.find(
                     (e: any) =>
                       moment(new Date(e.date)).format("MMM Do YY") ===
                       moment(new Date(props.day.date)).format("MMM Do YY"),
@@ -91,7 +100,11 @@ export default function Dashboard() {
             />
 
             {Boolean(date) && (
-              <EmotionDialog date={date} defaultData={defaultData}>
+              <EmotionDialog
+                date={date}
+                defaultData={defaultData}
+                hidden={Boolean(senderInfo)}
+              >
                 <Card className="relative h-fit w-full overflow-hidden shadow-[0_3px_6px_0_#00000010]">
                   <CardContent className="flex h-full flex-col items-center justify-center gap-4">
                     {defaultData === undefined ? (

@@ -1,4 +1,5 @@
 import { auth } from "@/lib/firebase";
+import { errorHandler } from "./func";
 
 async function getAiTip({
   emotion,
@@ -16,7 +17,7 @@ async function getAiTip({
     },
     body: JSON.stringify({ emotion, prev_context }),
   });
-  return res.json();
+  return errorHandler(res);
 }
 
 export { getAiTip };

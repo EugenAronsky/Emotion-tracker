@@ -22,8 +22,6 @@ export default function GoogleSignInButton() {
     try {
       const result = await signInWithPopup(auth, googleProvider);
       const token = await result.user.getIdToken();
-      // const user = result.user;
-
       // Отправляем токен на API route для HttpOnly cookie
       await fetch("/api/set-token", {
         method: "POST",
@@ -31,7 +29,12 @@ export default function GoogleSignInButton() {
         body: JSON.stringify({ token }),
       });
 
-      if (document.referrer.includes("http://localhost:3000")) router.back();
+      if (
+        document.referrer.includes(
+          "https://emotion-tracker-cs62igf0m-eugen-aronskiys-projects.vercel.app/",
+        )
+      )
+        router.back();
       else router.push("/dashboard");
     } catch (error: any) {
       console.error(error);

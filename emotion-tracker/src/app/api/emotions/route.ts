@@ -49,6 +49,7 @@ export async function POST(req: NextRequest) {
 
     // Сохраняем в Firestore
     if (decoded.uid === undefined) throw new Error("No UID in token");
+
     await adminDb.collection("emotions").add({
       uid: decoded.uid,
       emotion,

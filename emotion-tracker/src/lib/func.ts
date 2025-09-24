@@ -31,4 +31,18 @@ const shareScreenshot = async (id: string) => {
   }
 };
 
-export { shareScreenshot };
+const errorHandler = async (res: Response) => {
+  if (!res.ok) {
+    let errMsg = "Request failed";
+    try {
+      const errData = await res.json();
+      errMsg = errData.message || JSON.stringify(errData);
+    } catch {
+      errMsg = await res.text();
+    }
+    throw new Error(errMsg); // <-- важно!
+  }
+  return res.json();
+};
+
+export { shareScreenshot, errorHandler };

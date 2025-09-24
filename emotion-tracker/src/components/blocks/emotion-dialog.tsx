@@ -20,18 +20,46 @@ import { Label } from "../ui/label";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import { Slider } from "../ui/slider";
 import { Textarea } from "../ui/textarea";
+import {
+  Mutation,
+  UseMutationOptions,
+  UseMutationResult,
+} from "@tanstack/react-query";
 
 export function EmotionDialog({
   defaultData,
   children,
+  hidden,
   date,
 }: {
+  hidden?: boolean;
   date: Date | undefined;
   children: React.ReactNode;
   defaultData: EmotionReturnProps | undefined;
 }) {
   const [open, setOpen] = useState(false);
-  const { updateMutation, createMutation, deleteMutation } = useEmotions();
+  const { updateMutation, createMutation, deleteMutation } = !hidden
+    ? useEmotions()
+    : {
+        updateMutation: {} as UseMutationResult<
+          any,
+          Error,
+          {
+            id: string;
+            updates: Partial<EmotionForm>;
+          },
+          unknown
+        >,
+        createMutation: {} as UseMutationResult<
+          any,
+          Error,
+          EmotionForm & {
+            date?: Date | undefined;
+          },
+          unknown
+        >,
+        deleteMutation: {} as UseMutationResult<any, Error, string, unknown>,
+      };
 
   const defaultValues = {
     emotion: defaultData?.emotion || "Disgust",
@@ -89,7 +117,7 @@ export function EmotionDialog({
       <DialogContent className="overflow-hidden sm:max-w-[425px]">
         <div
           className={cn(
-            "absolute top-0 left-0 z-50 flex h-full w-full items-center justify-center bg-white/70 transition-all",
+            "absolute top-0 left-0 z-50 flex h-full w-full items-center justify-center transition-all",
             deleteMutation.isPending ||
               updateMutation.isPending ||
               createMutation.isPending
@@ -107,6 +135,7 @@ export function EmotionDialog({
           <Controller
             name="emotion"
             control={control}
+            disabled={hidden}
             defaultValue="Disgust"
             render={({ field }) => (
               <RadioGroup
@@ -166,13 +195,14 @@ export function EmotionDialog({
               </RadioGroup>
             )}
           />
-
           <Textarea
             {...register("description")}
-            className="h-36 resize-none"
+            className="h-36 resize-none disabled:opacity-100"
             placeholder="Add note..."
+            disabled={hidden}
           />
           <Controller
+            disabled={hidden}
             name="intensity"
             control={control}
             defaultValue={50}
@@ -187,6 +217,7 @@ export function EmotionDialog({
                   {...field}
                   value={[field.value]}
                   className={cn(
+                    "data-[disabled]:opacity-100",
                     watch("emotion") === "Anger" &&
                       "*:first:*:bg-red-200 *:last:*:border-red-700 *:last:*:bg-red-400",
 
@@ -209,7 +240,7 @@ export function EmotionDialog({
               </div>
             )}
           />
-          <DialogFooter className="mt-6 flex flex-row *:grow">
+          <DialogFooter className="mt-6 flex flex-row *:grow" hidden={hidden}>
             {defaultData && (
               <Button
                 onClick={() => deleteMutation.mutate(defaultData.id)}
