@@ -53,7 +53,7 @@ export default function Profile() {
               </CardContent>
             </Card>
 
-            <Card className="grow">
+            <Card className="max-h-[calc(100svh-293.6px)] grow overflow-hidden">
               <CardHeader className="text-md flex items-center justify-between">
                 <div className="text-md flex items-center gap-3">
                   <Waypoints size={20} />
@@ -70,11 +70,11 @@ export default function Profile() {
               </CardHeader>
               <CardContent
                 className={cn(
-                  "shadow-primary/15 mx-6 grow overflow-hidden rounded-lg p-4 shadow-[inset_0_0_10px_0]",
+                  "shadow-primary/15 mx-6 grow overflow-hidden overflow-y-scroll rounded-lg p-4 shadow-[inset_0_0_10px_0] dark:shadow-black/40",
                   collaboratorsQuery.isLoading && "p-0",
                 )}
               >
-                <section className="relative flex min-h-full flex-col">
+                <section className="relative flex min-h-full flex-col gap-3">
                   {!collaboratorsQuery.isLoading ? (
                     collaboratorsQuery.data?.myCollaborators.length ? (
                       collaboratorsQuery.data?.myCollaborators?.map(

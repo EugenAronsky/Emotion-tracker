@@ -26,7 +26,7 @@ export default function NavWrapper({
   }, [user, loading]);
 
   return (
-    <main className="flex h-full w-full flex-col">
+    <main className="flex h-full w-full flex-col overflow-hidden">
       <header
         className="mb-6 flex h-fit w-full items-center justify-between border-b px-6 py-4 shadow-sm/5"
         hidden={hidden}

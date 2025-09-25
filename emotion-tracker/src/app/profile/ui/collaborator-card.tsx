@@ -42,7 +42,7 @@ export default function CllaboratorCard({ senderInfo }: SenderInfo) {
   return (
     <Card
       className={cn(
-        "shadow-primary/15 relative rounded-md border-none py-3 shadow-[0_0_6px_0_#00000010]",
+        "shadow-primary/15 relative overflow-hidden rounded-md border-0 p-0 shadow-[0_0_6px_0] dark:shadow-black/40",
         removeCollaboratorMutation.isSuccess && "hidden",
       )}
     >
@@ -62,7 +62,7 @@ export default function CllaboratorCard({ senderInfo }: SenderInfo) {
 
       <CardContent
         onClick={() => setOpen(true)}
-        className="flex flex-row items-center justify-between px-3"
+        className="flex flex-row items-center justify-between p-3 dark:shadow-[inset_0_0_10px] dark:shadow-white/5"
       >
         <div className="flex items-center gap-3">
           <span
