@@ -16,6 +16,8 @@ export default function GoogleSignInButton() {
   const [redirect, setRedirect] = useState(false);
 
   useEffect(() => {
+    alert("work");
+
     (async () => {
       try {
         const result = await getRedirectResult(auth);
