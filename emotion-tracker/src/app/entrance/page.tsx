@@ -2,43 +2,47 @@
 
 import { Button } from "@/components/ui/button";
 import { auth, googleProvider } from "@/lib/firebase";
-import { signInWithPopup } from "firebase/auth";
+import {
+  browserPopupRedirectResolver,
+  signInWithRedirect,
+} from "firebase/auth";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { PuffLoader } from "react-spinners";
 
 export default function GoogleSignInButton() {
   const router = useRouter();
   const [redirect, setRedirect] = useState(false);
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      if (user) router.replace("/dashboard"); // если авторизован → на главную
+    const unsubscribe = auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        try {
+          const token = await user.getIdToken();
+          await fetch("/api/set-token", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ token }),
+          });
+          router.replace("/dashboard");
+        } catch (error: any) {
+          console.error(error);
+          alert(error.message);
+          setRedirect(false);
+        }
+      } // если авторизован → на главную
+      else setRedirect(false);
     });
 
     return () => unsubscribe();
   }, [router]);
 
   const handleGoogleSignIn = async () => {
-    try {
-      setRedirect(true);
-      const result = await signInWithPopup(auth, googleProvider);
-      const token = await result.user.getIdToken();
-      // Отправляем токен на API route для HttpOnly cookie
-
-      await fetch("/api/set-token", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token }),
-      });
-
-      router.push("/dashboard");
-    } catch (error: any) {
-      console.error(error);
-      alert(error.message);
-      setRedirect(false);
-    }
+    await signInWithRedirect(
+      auth,
+      googleProvider,
+      browserPopupRedirectResolver,
+    );
   };
 
   return (
