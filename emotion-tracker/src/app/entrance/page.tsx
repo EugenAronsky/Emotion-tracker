@@ -20,14 +20,13 @@ export default function GoogleSignInButton() {
   useEffect(() => {
     (async () => {
       try {
-        setRedirect(true);
-
         // Сохраняем сессию в localStorage
         await setPersistence(auth, browserLocalPersistence);
 
         // Получаем результат редиректа (если был)
         const result = await getRedirectResult(auth);
         if (result?.user) {
+          setRedirect(true);
           const token = await result.user.getIdToken();
 
           // Ставим HttpOnly cookie через API
