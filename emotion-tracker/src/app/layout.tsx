@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 import { ThemeProvider } from "next-themes";
+import MotionPageWrapper from "@/components/blocks/motion-page-wrapper";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -34,7 +35,9 @@ export default function RootLayout({
           defaultTheme="system"
           disableTransitionOnChange
         >
-          <Providers>{children}</Providers>
+          <Providers>
+            <MotionPageWrapper>{children}</MotionPageWrapper>
+          </Providers>
         </ThemeProvider>
       </body>
     </html>
