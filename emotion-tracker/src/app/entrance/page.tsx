@@ -4,10 +4,9 @@ import { Button } from "@/components/ui/button";
 import { auth, googleProvider } from "@/lib/firebase";
 import {
   browserLocalPersistence,
-  browserPopupRedirectResolver,
   getRedirectResult,
   setPersistence,
-  signInWithRedirect,
+  signInWithPopup,
 } from "firebase/auth";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -26,7 +25,7 @@ export default function GoogleSignInButton() {
         // Получаем результат редиректа (если был)
         const user = auth.currentUser;
 
-        alert(user);
+        const result = await getRedirectResult(auth);
 
         if (user) {
           setRedirect(true);
@@ -57,7 +56,7 @@ export default function GoogleSignInButton() {
   }, [router]);
 
   const handleGoogleSignIn = async () =>
-    await signInWithRedirect(auth, googleProvider);
+    await signInWithPopup(auth, googleProvider);
 
   return (
     <main className="flex h-full w-full items-center justify-center">
