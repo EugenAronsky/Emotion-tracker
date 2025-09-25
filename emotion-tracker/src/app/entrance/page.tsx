@@ -26,6 +26,8 @@ export default function GoogleSignInButton() {
         // Получаем результат редиректа (если был)
         const user = auth.currentUser;
 
+        alert(user);
+
         if (user) {
           setRedirect(true);
           const token = await user.getIdToken();
