@@ -24,10 +24,11 @@ export default function GoogleSignInButton() {
         await setPersistence(auth, browserLocalPersistence);
 
         // Получаем результат редиректа (если был)
-        const result = await getRedirectResult(auth);
-        if (result?.user) {
+        const user = auth.currentUser;
+
+        if (user) {
           setRedirect(true);
-          const token = await result.user.getIdToken();
+          const token = await user.getIdToken();
 
           // Ставим HttpOnly cookie через API
           await fetch("/api/set-token", {
@@ -53,9 +54,8 @@ export default function GoogleSignInButton() {
     })();
   }, [router]);
 
-  const handleGoogleSignIn = async () => {
+  const handleGoogleSignIn = async () =>
     await signInWithRedirect(auth, googleProvider);
-  };
 
   return (
     <main className="flex h-full w-full items-center justify-center">
