@@ -39,11 +39,7 @@ export default function GoogleSignInButton() {
   }, [router]);
 
   const handleGoogleSignIn = async () => {
-    await signInWithRedirect(
-      auth,
-      googleProvider,
-      browserPopupRedirectResolver,
-    );
+    await signInWithRedirect(auth, googleProvider);
   };
 
   return (
