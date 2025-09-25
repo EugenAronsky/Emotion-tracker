@@ -4,59 +4,47 @@ import { Button } from "@/components/ui/button";
 import { auth, googleProvider } from "@/lib/firebase";
 import {
   browserLocalPersistence,
-  getRedirectResult,
   setPersistence,
   signInWithPopup,
 } from "firebase/auth";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 export default function GoogleSignInButton() {
   const router = useRouter();
   const [redirect, setRedirect] = useState(false);
 
-  useEffect(() => {
-    (async () => {
-      try {
-        // Сохраняем сессию в localStorage
-        await setPersistence(auth, browserLocalPersistence);
+  const handleGoogleSignIn = async () => {
+    try {
+      setRedirect(true);
 
-        // Получаем результат редиректа (если был)
-        const user = auth.currentUser;
+      // Сохраняем сессию между перезагрузками
+      await setPersistence(auth, browserLocalPersistence);
 
-        const result = await getRedirectResult(auth);
+      // Открываем popup для Google login
+      const result = await signInWithPopup(auth, googleProvider);
 
-        if (user) {
-          setRedirect(true);
-          const token = await user.getIdToken();
+      // Получаем Firebase token
+      const token = await result.user.getIdToken();
 
-          // Ставим HttpOnly cookie через API
-          await fetch("/api/set-token", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ token }),
-            credentials: "include",
-          });
+      // Ставим HttpOnly cookie через API
+      await fetch("/api/set-token", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token }),
+        credentials: "include",
+      });
 
-          router.replace("/dashboard");
-        }
-
-        // Резервный редирект, если уже авторизован
-        else if (auth.currentUser) {
-          router.replace("/dashboard");
-        }
-      } catch (err: any) {
-        console.error("Auth error:", err);
-        alert(err.message ?? "Login failed");
-      } finally {
-        setRedirect(false);
-      }
-    })();
-  }, [router]);
-
-  const handleGoogleSignIn = async () =>
-    await signInWithPopup(auth, googleProvider);
+      // Редирект на dashboard
+      router.replace("/dashboard");
+    } catch (err: any) {
+      console.error(err);
+      alert(err.message ?? "Login failed");
+    } finally {
+      setRedirect(false);
+    }
+  };
 
   return (
     <main className="flex h-full w-full items-center justify-center">
