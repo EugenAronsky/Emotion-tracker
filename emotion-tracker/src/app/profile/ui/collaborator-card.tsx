@@ -60,11 +60,11 @@ export default function CllaboratorCard({ senderInfo }: SenderInfo) {
         <PuffLoader size={60} color="#3b82f6" />
       </div>
 
-      <CardContent
-        onClick={() => setOpen(true)}
-        className="flex flex-row items-center justify-between p-3 dark:shadow-[inset_0_0_10px] dark:shadow-white/5"
-      >
-        <div className="flex items-center gap-3">
+      <CardContent className="flex flex-row items-center justify-between p-0 dark:shadow-[inset_0_0_10px] dark:shadow-white/5">
+        <div
+          onClick={() => setOpen(true)}
+          className="flex w-full items-center gap-3 p-3"
+        >
           <span
             className={cn(
               "bg-primary flex size-10 items-center justify-center rounded-full p-1 text-2xl",
@@ -87,13 +87,15 @@ export default function CllaboratorCard({ senderInfo }: SenderInfo) {
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button size={"icon"} variant={"ghost"}>
+            <Button size={"icon"} variant={"ghost"} className="mr-3">
               <EllipsisVertical />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-fit min-w-0 *:gap-3" align="end">
             <DropdownMenuItem
-              onClick={() => removeCollaboratorMutation.mutate(senderInfo.uid)}
+              onClick={(event) => {
+                removeCollaboratorMutation.mutate(senderInfo.uid);
+              }}
             >
               <UserRoundX className="text-destructive" />
               <span className="text-destructive">Remove</span>

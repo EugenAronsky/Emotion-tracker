@@ -41,8 +41,6 @@ export default function GoogleSignInButton() {
     } catch (err: any) {
       console.error(err);
       alert(err.message ?? "Login failed");
-    } finally {
-      setRedirect(false);
     }
   };
 
