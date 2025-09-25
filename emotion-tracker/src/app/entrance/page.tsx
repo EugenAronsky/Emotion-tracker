@@ -18,6 +18,7 @@ export default function GoogleSignInButton() {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       if (user) {
         try {
+          setRedirect(true);
           const token = await user.getIdToken();
           await fetch("/api/set-token", {
             method: "POST",
