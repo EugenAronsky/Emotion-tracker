@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { auth, googleProvider } from "@/lib/firebase";
 import {
   browserPopupRedirectResolver,
+  getRedirectResult,
   signInWithRedirect,
 } from "firebase/auth";
 import Image from "next/image";
@@ -15,23 +16,31 @@ export default function GoogleSignInButton() {
   const [redirect, setRedirect] = useState(false);
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(async (user) => {
-      if (user) {
-        try {
+    (async () => {
+      try {
+        const result = await getRedirectResult(auth);
+        if (result?.user) {
           setRedirect(true);
-          const token = await user.getIdToken();
+          const token = await result.user.getIdToken();
+
           await fetch("/api/set-token", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ token }),
           });
+
           router.replace("/dashboard");
-        } catch (error: any) {
-          console.error(error);
-          alert(error.message);
-          setRedirect(false);
         }
-      } // если авторизован → на главную
+      } catch (error: any) {
+        console.error(error);
+        alert(error.message);
+        setRedirect(false);
+      }
+    })();
+
+    const unsubscribe = auth.onAuthStateChanged(async (user) => {
+      if (user) router.replace("/dashboard");
+      // если авторизован → на главную
       else setRedirect(false);
     });
 
