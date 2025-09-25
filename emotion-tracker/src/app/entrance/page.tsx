@@ -33,8 +33,6 @@ export default function GoogleSignInButton() {
         body: JSON.stringify({ token }),
       });
 
-      if (document.referrer.includes("eugen-aronskiys-projects.vercel.app/"))
-        router.back();
       router.push("/dashboard");
     } catch (error: any) {
       console.error(error);
