@@ -35,7 +35,7 @@ export default function GoogleSignInButton() {
 
       if (document.referrer.includes("eugen-aronskiys-projects.vercel.app/"))
         router.back();
-      else window.location.pathname = "/dashboard";
+      router.push("/dashboard");
     } catch (error: any) {
       console.error(error);
       alert(error.message);
