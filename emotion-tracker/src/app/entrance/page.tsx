@@ -3,8 +3,10 @@
 import { Button } from "@/components/ui/button";
 import { auth, googleProvider } from "@/lib/firebase";
 import {
+  browserLocalPersistence,
   browserPopupRedirectResolver,
   getRedirectResult,
+  setPersistence,
   signInWithRedirect,
 } from "firebase/auth";
 import Image from "next/image";
@@ -16,37 +18,40 @@ export default function GoogleSignInButton() {
   const [redirect, setRedirect] = useState(false);
 
   useEffect(() => {
-    alert("work");
-
     (async () => {
       try {
+        setRedirect(true);
+
+        // Сохраняем сессию в localStorage
+        await setPersistence(auth, browserLocalPersistence);
+
+        // Получаем результат редиректа (если был)
         const result = await getRedirectResult(auth);
         if (result?.user) {
-          setRedirect(true);
           const token = await result.user.getIdToken();
 
+          // Ставим HttpOnly cookie через API
           await fetch("/api/set-token", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ token }),
+            credentials: "include",
           });
 
           router.replace("/dashboard");
         }
-      } catch (error: any) {
-        console.error(error);
-        alert(error.message);
+
+        // Резервный редирект, если уже авторизован
+        else if (auth.currentUser) {
+          router.replace("/dashboard");
+        }
+      } catch (err: any) {
+        console.error("Auth error:", err);
+        alert(err.message ?? "Login failed");
+      } finally {
         setRedirect(false);
       }
     })();
-
-    const unsubscribe = auth.onAuthStateChanged(async (user) => {
-      if (user) router.replace("/dashboard");
-      // если авторизован → на главную
-      else setRedirect(false);
-    });
-
-    return () => unsubscribe();
   }, [router]);
 
   const handleGoogleSignIn = async () => {
