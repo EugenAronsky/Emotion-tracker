@@ -19,10 +19,10 @@ export default function GoogleSignInButton() {
   const [redirect, setRedirect] = useState(false);
 
   useEffect(() => {
-    setRedirect(true);
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       try {
         if (firebaseUser) {
+          setRedirect(true);
           const token = await firebaseUser.getIdToken();
 
           // Ставим HttpOnly cookie через API
