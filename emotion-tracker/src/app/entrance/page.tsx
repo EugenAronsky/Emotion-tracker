@@ -4,40 +4,55 @@ import { Button } from "@/components/ui/button";
 import { auth, googleProvider } from "@/lib/firebase";
 import {
   browserLocalPersistence,
+  getRedirectResult,
+  onAuthStateChanged,
   setPersistence,
   signInWithPopup,
+  signInWithRedirect,
 } from "firebase/auth";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function GoogleSignInButton() {
   const router = useRouter();
   const [redirect, setRedirect] = useState(false);
 
+  useEffect(() => {
+    setRedirect(true);
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      try {
+        if (firebaseUser) {
+          const token = await firebaseUser.getIdToken();
+
+          // Ставим HttpOnly cookie через API
+          await fetch("/api/set-token", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ token }),
+            credentials: "include",
+          });
+
+          router.replace("/dashboard");
+        }
+      } catch (err: any) {
+        console.error("Redirect login failed:", err);
+        setRedirect(false);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
   const handleGoogleSignIn = async () => {
     try {
       setRedirect(true);
 
-      // Сохраняем сессию между перезагрузками
+      // Сохраняем сессию
       await setPersistence(auth, browserLocalPersistence);
 
-      // Открываем popup для Google login
-      const result = await signInWithPopup(auth, googleProvider);
-
-      // Получаем Firebase token
-      const token = await result.user.getIdToken();
-
-      // Ставим HttpOnly cookie через API
-      await fetch("/api/set-token", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token }),
-        credentials: "include",
-      });
-
-      // Редирект на dashboard
-      router.replace("/dashboard");
+      // Запускаем редирект вместо popup
+      await signInWithRedirect(auth, googleProvider);
     } catch (err: any) {
       console.error(err);
       alert(err.message ?? "Login failed");
