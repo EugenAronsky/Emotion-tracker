@@ -73,12 +73,12 @@ export default function CollaboratorInfo({
           >
             <TabsTrigger value="dashboard" asChild>
               <Button variant={"secondary"}>
-                <Layout className="text-white" />
+                <Layout className="text-primary" />
               </Button>
             </TabsTrigger>
             <TabsTrigger value="statistics" asChild>
               <Button variant={"secondary"}>
-                <ChartArea className="text-white" />
+                <ChartArea className="text-primary" />
               </Button>
             </TabsTrigger>
           </TabsList>
