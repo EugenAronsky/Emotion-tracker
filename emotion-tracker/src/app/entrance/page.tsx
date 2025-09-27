@@ -20,6 +20,8 @@ export default function GoogleSignInButton() {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      console.log(firebaseUser);
+
       try {
         if (firebaseUser) {
           setRedirect(true);
