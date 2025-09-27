@@ -109,7 +109,6 @@ export default function Dashboard({
                   <CardContent className="flex h-full flex-col items-center justify-center gap-4">
                     {defaultData === undefined ? (
                       <>
-                        <Sticker size={60} />
                         <span className="flex flex-col items-center justify-center gap-2 text-center">
                           <b className="">No entries yet</b>
                           <p className="text-xs">

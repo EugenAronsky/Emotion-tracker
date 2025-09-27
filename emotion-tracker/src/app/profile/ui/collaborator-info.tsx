@@ -30,7 +30,7 @@ export default function CollaboratorInfo({
   return (
     <Dialog open={defaultOpen} onOpenChange={setDefaultOpen}>
       <DialogTrigger asChild></DialogTrigger>
-      <DialogContent className="flex h-full max-h-[calc(100%-2rem)] flex-col p-0 *:data-[slot='dialog-close']:invisible">
+      <DialogContent className="flex h-full max-h-[calc(100%-2rem)] flex-col gap-0 p-0 *:data-[slot='dialog-close']:invisible">
         <DialogHeader className="mb-6 flex h-fit w-full flex-row items-center justify-between border-b px-6 py-4 shadow-sm/5">
           <DialogTitle className="text-xl font-bold">
             {senderInfo.name}
@@ -58,7 +58,7 @@ export default function CollaboratorInfo({
           </div>
         </DialogHeader>
 
-        <Tabs className="grow" defaultValue="dashboard">
+        <Tabs className="grow gap-0" defaultValue="dashboard">
           <TabsContent value="dashboard">
             <Dashboard senderInfo={senderInfo} />
           </TabsContent>

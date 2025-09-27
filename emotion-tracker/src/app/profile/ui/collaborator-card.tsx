@@ -67,7 +67,7 @@ export default function CllaboratorCard({ senderInfo }: SenderInfo) {
         >
           <span
             className={cn(
-              "bg-primary flex size-10 items-center justify-center rounded-full p-1 text-2xl",
+              "bg-secondary flex size-10 items-center justify-center rounded-full p-1 text-2xl",
               emotion === "Anger" && "bg-red-300",
               emotion === "Sadness" && "bg-blue-300",
               emotion === "Disgust" && "bg-yellow-300",
@@ -80,7 +80,7 @@ export default function CllaboratorCard({ senderInfo }: SenderInfo) {
             ) : emotionsByUserIdAndByRangeQuery.data?.length ? (
               <>{Emotion[emotion as EmotionForm["emotion"]]}</>
             ) : (
-              <Ghost className="text-secondary" />
+              <Ghost className="text-primary/50" />
             )}
           </span>
           <span>{senderInfo.name}</span>

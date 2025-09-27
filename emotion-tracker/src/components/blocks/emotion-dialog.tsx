@@ -141,7 +141,7 @@ export function EmotionDialog({
               <RadioGroup
                 {...field}
                 onValueChange={field.onChange}
-                className="*:bg-secondary flex gap-3 *:flex *:size-14 *:items-center *:justify-center *:rounded-full"
+                className="*:bg-secondary flex justify-between gap-3 *:flex *:size-14 *:items-center *:justify-center *:rounded-full *:max-[400px]:size-12 *:max-[400px]:text-3xl"
               >
                 <Label
                   className={cn(
