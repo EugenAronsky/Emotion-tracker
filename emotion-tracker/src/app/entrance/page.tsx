@@ -9,21 +9,24 @@ import {
 } from "firebase/auth";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function GoogleSignInButton() {
   const router = useRouter();
   const [redirect, setRedirect] = useState(false);
 
+  useEffect(() => {
+    (async () => await setPersistence(auth, browserLocalPersistence))();
+  }, []);
+
   const handleGoogleSignIn = async () => {
     try {
       setRedirect(true);
 
-      // Сохраняем сессию между перезагрузками
-      await setPersistence(auth, browserLocalPersistence);
-
       // Открываем popup для Google login
       const result = await signInWithPopup(auth, googleProvider);
+
+      // Сохраняем сессию между перезагрузками
 
       // Получаем Firebase token
       const token = await result.user.getIdToken();
@@ -41,6 +44,8 @@ export default function GoogleSignInButton() {
     } catch (err: any) {
       console.error(err);
       alert(err.message ?? "Login failed");
+    } finally {
+      setRedirect(false);
     }
   };
 

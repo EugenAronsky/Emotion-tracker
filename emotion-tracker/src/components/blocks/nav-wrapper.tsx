@@ -28,7 +28,7 @@ export default function NavWrapper({
   return (
     <main className="flex h-full w-full flex-col overflow-hidden">
       <header
-        className="mb-6 flex h-fit w-full items-center justify-between border-b px-6 py-4 shadow-sm/5"
+        className="mb-6 flex h-fit w-full items-center justify-between border-b px-6 py-3 shadow-sm/5"
         hidden={hidden}
       >
         <h1 className="text-xl font-bold">Mood Diary</h1>
@@ -44,7 +44,7 @@ export default function NavWrapper({
       </header>
       <section className="flex grow px-6 pb-6">{children}</section>
       <footer
-        className="flex h-fit w-full items-center justify-around gap-4 border-t px-6 py-4 *:*:grow *:grow"
+        className="flex h-fit w-full items-center justify-around gap-4 border-t px-6 pt-3 pb-0 *:*:grow *:grow"
         hidden={hidden}
       >
         <Link href="/dashboard" className="flex items-center">

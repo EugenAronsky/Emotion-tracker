@@ -3,10 +3,12 @@ import { useFirebaseUser } from "./useFirebaseUser";
 import {
   addCollaborator,
   getCollaborators,
+  getPermissionByCollaboratorUid,
   removeCollaborator,
-} from "@/lib/collaborators-controller";
+  updateCollaborator,
+} from "@/lib/controllers/collaborators-controller";
 
-export function useCollaborators() {
+export function useCollaborators(options?: { user_id?: string | undefined }) {
   const queryClient = useQueryClient();
   const { user } = useFirebaseUser();
 
@@ -16,6 +18,14 @@ export function useCollaborators() {
     staleTime: 1000 * 60,
     refetchOnWindowFocus: false,
     enabled: !!user?.uid, // только если пользователь авторизован
+  });
+
+  const collaboratorPermissionQuery = useQuery({
+    queryKey: ["collaborator-permission", options?.user_id],
+    queryFn: async () => await getPermissionByCollaboratorUid(options?.user_id),
+    staleTime: 1000 * 60,
+    refetchOnWindowFocus: false,
+    enabled: !!user?.uid && !!options?.user_id, // только если пользователь авторизован
   });
 
   const addCollaboratorMutation = useMutation({
@@ -32,9 +42,18 @@ export function useCollaborators() {
     },
   });
 
+  const updateCollaboratorMutation = useMutation({
+    mutationFn: updateCollaborator,
+    onSuccess: () => {
+      queryClient.refetchQueries({ queryKey: ["collaborators"] }); // рефетч
+    },
+  });
+
   return {
     collaboratorsQuery,
     addCollaboratorMutation,
     removeCollaboratorMutation,
+    updateCollaboratorMutation,
+    collaboratorPermissionQuery,
   };
 }

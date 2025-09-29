@@ -9,9 +9,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useCollaborators } from "@/hooks/useCollaborators";
 import { useInvites } from "@/hooks/useInvite";
-import { CollaboratorForm, EmotionReturnProps } from "@/lib/type";
+import { CollaboratorForm } from "@/lib/type";
 import { cn } from "@/lib/utils";
 import {
   Check,
@@ -19,15 +18,11 @@ import {
   HardDriveUpload,
   Send,
   TicketX,
-  Trash2,
+  UserRoundX,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { PuffLoader } from "react-spinners";
-import { Input } from "../ui/input";
-import { Label } from "../ui/label";
-import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import {
   Command,
   CommandEmpty,
@@ -36,6 +31,10 @@ import {
   CommandItem,
   CommandList,
 } from "../ui/command";
+import { Label } from "../ui/label";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
+import { useCollaborators } from "@/hooks/useCollaborators";
 
 export function CollaboratorDialog({
   defaultData,
@@ -43,25 +42,25 @@ export function CollaboratorDialog({
   emails,
 }: {
   emails: Array<string>;
-  children: React.ReactNode;
-  defaultData?: EmotionReturnProps | undefined;
+  children?: React.ReactNode;
+  defaultData?: (CollaboratorForm & { uid: string; name: string }) | undefined;
 }) {
   const [open, setOpen] = useState(false);
   const { inviteCollaboratorMutation } = useInvites();
+  const { updateCollaboratorMutation, removeCollaboratorMutation } =
+    useCollaborators();
 
   const [openPopover, setOpenPopover] = useState(false);
   const [value, setValue] = useState("");
 
   const defaultValues = {
-    email: defaultData?.emotion || "",
-    role: "viewer",
+    email: defaultData?.email || "",
+    permission: defaultData?.permission || "observer",
   };
 
   const {
-    watch,
     reset,
     control,
-    register,
     handleSubmit,
     formState: { errors },
   } = useForm<CollaboratorForm>();
@@ -75,7 +74,12 @@ export function CollaboratorDialog({
   };
 
   const onSubmit: SubmitHandler<CollaboratorForm> = async (data) => {
-    inviteCollaboratorMutation.mutate(data, { onSuccess: () => close() });
+    defaultData !== undefined
+      ? updateCollaboratorMutation.mutate(
+          { permission: data.permission, user_id: defaultData.uid },
+          { onSuccess: () => close() },
+        )
+      : inviteCollaboratorMutation.mutate(data, { onSuccess: () => close() });
   };
 
   return (
@@ -84,7 +88,12 @@ export function CollaboratorDialog({
         setOpen(value);
         setValue("");
       }}
-      open={inviteCollaboratorMutation.isPending ? true : open}
+      open={
+        inviteCollaboratorMutation.isPending ||
+        removeCollaboratorMutation.isPending
+          ? true
+          : open
+      }
     >
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent
@@ -94,15 +103,22 @@ export function CollaboratorDialog({
         <div
           className={cn(
             "bg-secondary/60 absolute top-0 left-0 z-50 flex h-full w-full items-center justify-center transition-all",
-            inviteCollaboratorMutation.isPending || "invisible",
+            inviteCollaboratorMutation.isPending ||
+              removeCollaboratorMutation.isPending ||
+              updateCollaboratorMutation.isPending ||
+              "invisible",
           )}
         >
           <PuffLoader size={140} color="#3b82f6" />
         </div>
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
           <DialogHeader className="mb-3">
-            <DialogTitle>Invite friend</DialogTitle>
-            <DialogDescription>Share emotion with friends!</DialogDescription>
+            <DialogTitle>
+              {defaultData?.name ? defaultData.name : "Invite friend"}
+            </DialogTitle>
+            <DialogDescription hidden={Boolean(defaultData)}>
+              Share emotion with friends!
+            </DialogDescription>
           </DialogHeader>
 
           <Controller
@@ -110,16 +126,18 @@ export function CollaboratorDialog({
             control={control}
             render={({ field }) => (
               <Popover open={openPopover} onOpenChange={setOpenPopover}>
-                <PopoverTrigger asChild>
+                <PopoverTrigger asChild disabled={Boolean(defaultData?.email)}>
                   <Button
-                    variant="outline"
                     role="combobox"
+                    variant="outline"
                     aria-expanded={openPopover}
                     className="w-full justify-between"
                   >
-                    {value
-                      ? emails.find((email) => email === value)
-                      : "Select email..."}
+                    {defaultData?.email
+                      ? defaultData?.email
+                      : value
+                        ? emails.find((email) => email === value)
+                        : "Select email..."}
                     <ChevronsUpDown className="opacity-50" />
                   </Button>
                 </PopoverTrigger>
@@ -166,53 +184,62 @@ export function CollaboratorDialog({
             )}
           />
 
-          {/* <Controller
-            name="role"
+          <Controller
+            name="permission"
             control={control}
-            defaultValue="viewer"
+            defaultValue="observer"
             render={({ field }) => (
               <RadioGroup
                 {...field}
                 onValueChange={field.onChange}
-                className="flex gap-3 *:flex *:items-center *:justify-center *:rounded-full"
+                className="*:border-input flex gap-3 *:flex *:h-9 *:w-full *:items-center *:justify-center *:rounded-md *:border *:px-3 *:py-1.5"
               >
                 <Label
                   className={cn(
                     "flex items-center justify-center gap-3 text-base transition-all",
+                    field.value === "observer" && "!bg-purple-500 text-white",
                   )}
                 >
-                  Viewer
-                  <RadioGroupItem
-                    value="viewer"
-                    className={cn(field.value === "viewer" && "!bg-green-300")}
-                  />
+                  Observer
+                  <RadioGroupItem value="observer" className="hidden" />
                 </Label>
 
                 <Label
                   className={cn(
                     "flex items-center justify-center gap-3 text-base transition-all",
+                    field.value === "viewer" && "!bg-sky-400 text-white",
+                  )}
+                >
+                  Viewer
+                  <RadioGroupItem value="viewer" className="hidden" />
+                </Label>
+
+                <Label
+                  className={cn(
+                    "flex items-center justify-center gap-3 text-base transition-all",
+                    field.value === "reader" && "!bg-teal-400 text-white",
                   )}
                 >
                   Reader
-                  <RadioGroupItem
-                    value="reader"
-                    className={cn(field.value === "reader" && "!bg-blue-300")}
-                  />
+                  <RadioGroupItem value="reader" className="hidden" />
                 </Label>
               </RadioGroup>
             )}
-          /> */}
+          />
 
           <DialogFooter className="mt-3 flex flex-row *:grow">
             {defaultData && (
               <Button
-                // onClick={() => deleteMutation.mutate(defaultData.id)}
+                onClick={() => {
+                  Boolean(defaultData) &&
+                    removeCollaboratorMutation.mutate(defaultData.uid);
+                }}
                 variant="destructive"
                 className="!grow-0"
                 size={"icon"}
                 type="button"
               >
-                <Trash2 />
+                <UserRoundX />
               </Button>
             )}
             <DialogClose asChild>

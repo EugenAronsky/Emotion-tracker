@@ -1,5 +1,5 @@
 import { auth } from "@/lib/firebase";
-import { errorHandler } from "./func";
+import { errorHandler } from "../func";
 
 async function getAiTip({
   emotion,

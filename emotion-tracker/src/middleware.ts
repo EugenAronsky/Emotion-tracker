@@ -7,6 +7,10 @@ import { adminAuth } from "./lib/firebaseAdmin";
 export async function middleware(req: NextRequest) {
   const token = req.cookies.get("token")?.value;
 
+  if (req.nextUrl.pathname.startsWith("/manifest.json")) {
+    return NextResponse.next();
+  }
+
   if (!token) {
     return NextResponse.redirect(new URL("/entrance", req.url));
   }

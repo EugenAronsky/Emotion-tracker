@@ -6,7 +6,7 @@ import {
   getEmotionsByUserId,
   getEmotionsByUserIdAndByRange,
   updateEmotion,
-} from "@/lib/emotions-controller";
+} from "@/lib/controllers/emotions-controller";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useFirebaseUser } from "./useFirebaseUser";
 

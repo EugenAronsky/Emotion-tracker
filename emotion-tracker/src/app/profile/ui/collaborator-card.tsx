@@ -14,15 +14,22 @@ import { cn } from "@/lib/utils";
 import {
   EllipsisVertical,
   Ghost,
-  Info,
   LoaderCircle,
+  UserRoundPen,
   UserRoundX,
 } from "lucide-react";
+import { useMemo, useState } from "react";
 import { PuffLoader } from "react-spinners";
 import CollaboratorInfo from "./collaborator-info";
-import { useMemo, useState } from "react";
+import { CollaboratorDialog } from "@/components/blocks/collaborator-dialog";
 
-export default function CllaboratorCard({ senderInfo }: SenderInfo) {
+export default function CllaboratorCard({
+  emails,
+  senderInfo,
+}: {
+  senderInfo: SenderInfo;
+  emails: Array<string>;
+}) {
   const [open, setOpen] = useState(false);
 
   const fromDate = useMemo(() => {
@@ -31,13 +38,15 @@ export default function CllaboratorCard({ senderInfo }: SenderInfo) {
     return date.setDate(date.getDate());
   }, []);
 
-  const { removeCollaboratorMutation } = useCollaborators();
+  const { removeCollaboratorMutation, collaboratorPermissionQuery } =
+    useCollaborators({ user_id: senderInfo.uid });
   const { emotionsByUserIdAndByRangeQuery } = useEmotions({
     user_id: senderInfo.uid,
     fromDate: fromDate,
   });
 
   const emotion = emotionsByUserIdAndByRangeQuery.data?.at(0)?.emotion;
+  const my_permission = collaboratorPermissionQuery.data?.permission;
 
   return (
     <Card
@@ -50,6 +59,7 @@ export default function CllaboratorCard({ senderInfo }: SenderInfo) {
         defaultOpen={open}
         senderInfo={senderInfo}
         setDefaultOpen={setOpen}
+        permission={my_permission}
       />
       <div
         className={cn(
@@ -60,14 +70,33 @@ export default function CllaboratorCard({ senderInfo }: SenderInfo) {
         <PuffLoader size={60} color="#3b82f6" />
       </div>
 
-      <CardContent className="flex flex-row items-center justify-between p-0 dark:shadow-[inset_0_0_10px] dark:shadow-white/5">
+      <CardContent
+        className={cn(
+          "flex flex-row items-center justify-between p-0 shadow-white/5 dark:shadow-[inset_0_0_10px]",
+          senderInfo.permission === "observer" &&
+            "to-card bg-gradient-to-r from-purple-200 to-[80%] dark:from-purple-900",
+          senderInfo.permission === "viewer" &&
+            "to-card bg-gradient-to-r from-sky-200 to-[80%] dark:from-sky-900",
+          senderInfo.permission === "reader" &&
+            "to-card bg-gradient-to-r from-teal-200 to-[80%] dark:from-teal-900",
+        )}
+      >
         <div
-          onClick={() => setOpen(true)}
+          className={cn(
+            "absolute top-0 left-0 h-6 w-2 -skew-x-[45deg]",
+            my_permission === "observer" && "bg-purple-500",
+            my_permission === "viewer" && "bg-sky-400",
+            my_permission === "reader" && "bg-teal-400",
+          )}
+        />
+
+        <div
+          onClick={() => my_permission !== "observer" && setOpen(true)}
           className="flex w-full items-center gap-3 p-3"
         >
           <span
             className={cn(
-              "bg-secondary flex size-10 items-center justify-center rounded-full p-1 text-2xl",
+              "bg-secondary flex size-10 items-center justify-center rounded-full p-1 text-2xl shadow-[0_2px_7px_-2px] shadow-black/50 dark:shadow-[0_2px_8px_-1px]",
               emotion === "Anger" && "bg-red-300",
               emotion === "Sadness" && "bg-blue-300",
               emotion === "Disgust" && "bg-yellow-300",
@@ -83,17 +112,33 @@ export default function CllaboratorCard({ senderInfo }: SenderInfo) {
               <Ghost className="text-primary/50" />
             )}
           </span>
-          <span>{senderInfo.name}</span>
+          <span className="font-[500] opacity-90">{senderInfo.name}</span>
         </div>
-        <DropdownMenu>
+        <DropdownMenu modal={false}>
           <DropdownMenuTrigger asChild>
             <Button size={"icon"} variant={"ghost"} className="mr-3">
               <EllipsisVertical />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-fit min-w-0 *:gap-3" align="end">
+            <DropdownMenuItem asChild>
+              <CollaboratorDialog
+                defaultData={{
+                  uid: senderInfo.uid,
+                  name: senderInfo.name,
+                  email: senderInfo.email,
+                  permission: senderInfo.permission,
+                }}
+                emails={emails}
+              >
+                <div className="flex h-8 w-full gap-3 px-2 py-1.5">
+                  <UserRoundPen size={16} />
+                  <span className="text-sm">Edit</span>
+                </div>
+              </CollaboratorDialog>
+            </DropdownMenuItem>
             <DropdownMenuItem
-              onClick={(event) => {
+              onClick={() => {
                 removeCollaboratorMutation.mutate(senderInfo.uid);
               }}
             >

@@ -1,6 +1,6 @@
 import { auth } from "@/lib/firebase";
-import { EmotionForm } from "./type";
-import { errorHandler } from "./func";
+import { EmotionForm } from "../type";
+import { errorHandler } from "../func";
 
 // Создать эмоцию
 async function createEmotion(data: EmotionForm & { date?: Date | undefined }) {

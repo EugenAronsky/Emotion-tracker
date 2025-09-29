@@ -6,9 +6,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useEmotions } from "@/hooks/useEmotions";
 import { useFirebaseUser } from "@/hooks/useFirebaseUser";
 import { Emotion } from "@/lib/enums";
-import { EmotionReturnProps, SenderInfo } from "@/lib/type";
+import { EmotionReturnProps, Permission, SenderInfo } from "@/lib/type";
 import { cn } from "@/lib/utils";
-import { Sticker } from "lucide-react";
 import moment from "moment";
 import React, { useEffect } from "react";
 import { PuffLoader } from "react-spinners";
@@ -16,8 +15,10 @@ import Wave from "react-wavify";
 
 export default function Dashboard({
   senderInfo,
+  permission,
 }: {
-  senderInfo?: SenderInfo["senderInfo"];
+  senderInfo?: SenderInfo;
+  permission?: Permission;
 }) {
   const { emotionsQuery, emotionsByUserIdQuery } = useEmotions({
     user_id: senderInfo?.uid,
@@ -61,11 +62,12 @@ export default function Dashboard({
               broadcastCalendar
               onSelect={setDate}
               captionLayout="label"
-              className="bg-card flex w-full justify-center rounded-xl border shadow-sm *:w-11/12 [&_tbody>tr]:gap-0.5"
+              className="bg-card flex aspect-[1.02/.98] w-full justify-center rounded-xl border shadow-sm *:w-11/12 [&_tbody>tr]:gap-0.5"
               classNames={{
                 caption_label: "text-lg font-bold",
                 chevron: "size-5",
                 today: "bg-sky-200/20 !rounded-full",
+                month_grid: "my-auto",
               }}
               disabled={{ after: new Date() }}
               components={{
@@ -102,8 +104,8 @@ export default function Dashboard({
             {Boolean(date) && (
               <EmotionDialog
                 date={date}
+                permission={permission}
                 defaultData={defaultData}
-                hidden={Boolean(senderInfo)}
               >
                 <Card className="relative h-fit w-full overflow-hidden shadow-[0_3px_6px_0_#00000010]">
                   <CardContent className="flex h-full flex-col items-center justify-center gap-4">

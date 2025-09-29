@@ -10,8 +10,9 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useEmotions } from "@/hooks/useEmotions";
-import { EmotionForm, EmotionReturnProps } from "@/lib/type";
+import { EmotionForm, EmotionReturnProps, Permission } from "@/lib/type";
 import { cn } from "@/lib/utils";
+import { UseMutationResult } from "@tanstack/react-query";
 import { Eraser, HardDriveUpload, Trash2, UploadCloud } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
@@ -20,23 +21,19 @@ import { Label } from "../ui/label";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import { Slider } from "../ui/slider";
 import { Textarea } from "../ui/textarea";
-import {
-  Mutation,
-  UseMutationOptions,
-  UseMutationResult,
-} from "@tanstack/react-query";
 
 export function EmotionDialog({
   defaultData,
+  permission,
   children,
-  hidden,
   date,
 }: {
-  hidden?: boolean;
   date: Date | undefined;
+  permission?: Permission;
   children: React.ReactNode;
   defaultData: EmotionReturnProps | undefined;
 }) {
+  const hidden = Boolean(permission);
   const [open, setOpen] = useState(false);
   const { updateMutation, createMutation, deleteMutation } = !hidden
     ? useEmotions()
@@ -113,7 +110,15 @@ export function EmotionDialog({
       }
       onOpenChange={setOpen}
     >
-      <DialogTrigger asChild>{children}</DialogTrigger>
+      <DialogTrigger
+        className={cn(
+          Boolean(permission) && "pointer-events-none",
+          permission === "reader" && "pointer-events-auto",
+        )}
+        asChild
+      >
+        {children}
+      </DialogTrigger>
       <DialogContent className="overflow-hidden sm:max-w-[425px]">
         <div
           className={cn(

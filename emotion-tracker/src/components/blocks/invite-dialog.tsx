@@ -47,6 +47,14 @@ export function InviteDialog({ data }: { data: InviteProps }) {
           <DialogDescription>
             Invite you to share yours emotions!
           </DialogDescription>
+          <div
+            className={cn(
+              "absolute top-0 left-0 h-8 w-3 -skew-x-[45deg]",
+              data.senderInfo.permission === "observer" && "bg-purple-500",
+              data.senderInfo.permission === "viewer" && "bg-sky-400",
+              data.senderInfo.permission === "reader" && "bg-teal-400",
+            )}
+          />
         </DialogHeader>
 
         <DialogFooter className="flex flex-row *:grow">

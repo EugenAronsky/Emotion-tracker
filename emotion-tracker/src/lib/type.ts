@@ -1,5 +1,8 @@
+export type Permission = "observer" | "viewer" | "reader";
+export type Emotion = "Anger" | "Sadness" | "Disgust" | "Joy" | "Love";
+
 export type EmotionForm = {
-  emotion: "Anger" | "Sadness" | "Disgust" | "Joy" | "Love";
+  emotion: Emotion;
   description: string;
   intensity: number;
 };
@@ -13,7 +16,7 @@ export type EmotionReturnProps = EmotionForm & {
 
 export type CollaboratorForm = {
   email: string;
-  role: string;
+  permission: Permission;
 };
 
 export type InviteProps = {
@@ -22,14 +25,16 @@ export type InviteProps = {
   senderInfo: {
     name: string;
     picture: string;
+    permission: Permission;
+    email: string;
   };
   to: string;
 };
 
 export type SenderInfo = {
-  senderInfo: {
-    name: string;
-    picture: string;
-    uid: string;
-  };
+  uid: string;
+  name: string;
+  email: string;
+  picture: string;
+  permission: Permission;
 };

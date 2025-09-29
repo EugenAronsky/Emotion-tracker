@@ -13,6 +13,7 @@ import { TabProps } from "../page";
 export default function MonthTab({
   sortedPieChartData,
   pieChartData,
+  permission,
   id,
 }: TabProps & { id?: string }) {
   const maxIntensity = useRef<number>(0);
@@ -26,7 +27,10 @@ export default function MonthTab({
       <Card className="relative h-fit w-full overflow-hidden">
         <Button
           onClick={async () => id && (await shareScreenshot(id))}
-          className="absolute top-5 right-1 z-20"
+          className={cn(
+            "absolute top-5 right-1 z-20",
+            Boolean(permission) && "hidden",
+          )}
           variant={"ghost"}
           size={"icon"}
         >
@@ -96,7 +100,7 @@ export default function MonthTab({
               >
                 {pieChartData
                   .filter((emotion) => emotion.value > 0)
-                  .map((entry, index) => (
+                  .map((entry) => (
                     <Cell
                       stroke="trnsperent"
                       key={`cell-${entry.name}`}

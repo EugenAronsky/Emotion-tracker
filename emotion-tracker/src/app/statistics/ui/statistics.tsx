@@ -3,15 +3,13 @@ import NavWrapper from "@/components/blocks/nav-wrapper";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useEmotions } from "@/hooks/useEmotions";
 import { useFirebaseUser } from "@/hooks/useFirebaseUser";
-import { useGemini } from "@/hooks/useGemini";
 import { Emotion } from "@/lib/enums";
-import { EmotionReturnProps, SenderInfo } from "@/lib/type";
-import { useQueryClient } from "@tanstack/react-query";
+import { EmotionReturnProps, Permission, SenderInfo } from "@/lib/type";
+import { VenetianMask } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { PuffLoader } from "react-spinners";
-import { VenetianMask } from "lucide-react";
-import WeekTab from "./week-tab";
 import MonthTab from "./month-tab";
+import WeekTab from "./week-tab";
 import YearTab from "./year-tab";
 
 export type TabProps = {
@@ -27,8 +25,10 @@ export type TabProps = {
 
 export default function Statistics({
   senderInfo,
+  permission,
 }: {
-  senderInfo?: SenderInfo["senderInfo"];
+  senderInfo?: SenderInfo;
+  permission?: Permission;
 }) {
   const defaultFromDate = useMemo(() => {
     const date = new Date();
@@ -158,16 +158,19 @@ export default function Statistics({
             <WeekTab
               id="week"
               pieChartData={pieChartData}
+              permission={permission}
               sortedPieChartData={sortedPieChartData}
             />
             <MonthTab
               id="month"
               pieChartData={pieChartData}
+              permission={permission}
               sortedPieChartData={sortedPieChartData}
             />
             <YearTab
               id="year"
               pieChartData={pieChartData}
+              permission={permission}
               sortedPieChartData={sortedPieChartData}
             />
 

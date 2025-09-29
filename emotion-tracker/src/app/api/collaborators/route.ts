@@ -28,15 +28,8 @@ export async function GET(req: NextRequest) {
       .map((doc) => {
         const data = doc.data();
         const index = myCollaborators.findIndex(
-          ({
-            senderInfo,
-          }: {
-            senderInfo: {
-              name: string;
-              picture: string;
-              uid: string;
-            };
-          }) => senderInfo.uid === data.ownerId,
+          (senderInfo: { name: string; picture: string; uid: string }) =>
+            senderInfo.uid === data.ownerId,
         );
 
         if (index === -1) return data.ownerEmail;
@@ -100,11 +93,11 @@ export async function POST(req: Request) {
           sharedWith: [
             ...FromEmotionSetData.sharedWith,
             {
-              senderInfo: {
-                uid: decoded.uid,
-                name: decoded.name,
-                picture: decoded.picture,
-              },
+              uid: decoded.uid,
+              name: decoded.name,
+              picture: decoded.picture,
+              permission: senderInfo.permission,
+              email: decoded.email,
             },
           ],
         });
@@ -114,10 +107,8 @@ export async function POST(req: Request) {
           sharedWith: [
             ...ToEmotionSetData.sharedWith,
             {
-              senderInfo: {
-                uid: from,
-                ...senderInfo,
-              },
+              uid: from,
+              ...senderInfo,
             },
           ],
         });

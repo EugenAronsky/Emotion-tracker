@@ -1,6 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
 import { adminAuth, adminDb } from "@/lib/firebaseAdmin";
+import { Permission, SenderInfo } from "@/lib/type";
 import { Timestamp } from "firebase-admin/firestore";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
   req: NextRequest,
@@ -14,6 +15,26 @@ export async function GET(
     if (!token)
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+    const decoded = await adminAuth.verifyIdToken(token);
+
+    const emotionSets = await adminDb
+      .collection("emotion-sets")
+      .where("ownerId", "==", user_id)
+      .limit(1)
+      .get();
+
+    const EmotionSetDoc = emotionSets.docs[0];
+
+    if (!EmotionSetDoc.exists) {
+      return NextResponse.json({ error: "Not found" }, { status: 404 });
+    }
+
+    const EmotionSetData = EmotionSetDoc.data();
+
+    const permission: Permission = EmotionSetData.sharedWith.find(
+      (collaborator: SenderInfo) => collaborator.uid === decoded.uid,
+    ).permission;
+
     const snapshot = Boolean(fromDate)
       ? await adminDb
           .collection("emotions")
@@ -25,11 +46,30 @@ export async function GET(
 
     const emotions = snapshot.docs.map((doc) => {
       const data = doc.data();
-      return {
-        id: doc.id,
-        ...data,
-        date: data.date.toDate(),
-      };
+
+      switch (permission) {
+        case "observer":
+          return {
+            id: null,
+            emotion: data.emotion,
+            date: data.date.toDate(),
+          };
+
+        case "viewer":
+          return {
+            ...data,
+            id: null,
+            description: null,
+            date: data.date.toDate(),
+          };
+
+        case "reader":
+          return {
+            ...data,
+            id: null,
+            date: data.date.toDate(),
+          };
+      }
     });
 
     return NextResponse.json(emotions);

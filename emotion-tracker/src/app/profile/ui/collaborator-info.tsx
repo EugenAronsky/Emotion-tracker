@@ -11,7 +11,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { SenderInfo } from "@/lib/type";
+import { Permission, SenderInfo } from "@/lib/type";
 import { ChartArea, Layout, Moon, Sun, User2, X } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Dispatch, SetStateAction, useState } from "react";
@@ -20,16 +20,18 @@ export default function CollaboratorInfo({
   senderInfo,
   defaultOpen,
   setDefaultOpen,
+  permission,
 }: {
   defaultOpen: boolean;
-  senderInfo: SenderInfo["senderInfo"];
+  permission: Permission;
+  senderInfo: SenderInfo;
   setDefaultOpen: Dispatch<SetStateAction<boolean>>;
 }) {
   const { theme, setTheme } = useTheme();
 
   return (
     <Dialog open={defaultOpen} onOpenChange={setDefaultOpen}>
-      <DialogTrigger asChild></DialogTrigger>
+      <DialogTrigger asChild />
       <DialogContent className="flex h-full max-h-[calc(100%-2rem)] flex-col gap-0 p-0 *:data-[slot='dialog-close']:invisible">
         <DialogHeader className="mb-6 flex h-fit w-full flex-row items-center justify-between border-b px-6 py-4 shadow-sm/5">
           <DialogTitle className="text-xl font-bold">
@@ -60,11 +62,11 @@ export default function CollaboratorInfo({
 
         <Tabs className="grow gap-0" defaultValue="dashboard">
           <TabsContent value="dashboard">
-            <Dashboard senderInfo={senderInfo} />
+            <Dashboard senderInfo={senderInfo} permission={permission} />
           </TabsContent>
 
           <TabsContent value="statistics">
-            <Statistics senderInfo={senderInfo} />
+            <Statistics senderInfo={senderInfo} permission={permission} />
           </TabsContent>
 
           <TabsList

@@ -5,7 +5,7 @@ import {
   denyInvite,
   getInvites,
   inviteCollaborator,
-} from "@/lib/invites-controller";
+} from "@/lib/controllers/invites-controller";
 
 export function useInvites() {
   const { user } = useFirebaseUser();

@@ -27,7 +27,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: Request) {
   try {
     const token = req.headers.get("authorization")?.split("Bearer ")[1];
-    const { email, role } = await req.json();
+    const { email, permission } = await req.json();
 
     if (!token) {
       return NextResponse.json({ error: "Token is required" }, { status: 400 });
@@ -75,6 +75,8 @@ export async function POST(req: Request) {
           senderInfo: {
             name: decoded.name,
             picture: decoded.picture,
+            permission: permission,
+            email: email,
           },
         });
       else

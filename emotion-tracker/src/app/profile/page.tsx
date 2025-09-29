@@ -71,17 +71,20 @@ export default function Profile() {
               <CardContent
                 className={cn(
                   "shadow-primary/15 mx-6 grow overflow-hidden overflow-y-scroll rounded-lg p-4 shadow-[inset_0_0_10px_0] dark:shadow-black/40",
-                  collaboratorsQuery.isLoading && "p-0",
+                  collaboratorsQuery.isFetching && "p-0",
                 )}
               >
                 <section className="relative flex min-h-full flex-col gap-3">
-                  {!collaboratorsQuery.isLoading ? (
+                  {!collaboratorsQuery.isFetching ? (
                     collaboratorsQuery.data?.myCollaborators.length ? (
                       collaboratorsQuery.data?.myCollaborators?.map(
-                        ({ senderInfo }: SenderInfo, index: number) => (
+                        (senderInfo: SenderInfo, index: number) => (
                           <CllaboratorCard
                             senderInfo={senderInfo}
                             key={`collaborator-${index}`}
+                            emails={
+                              collaboratorsQuery.data?.collaboratorsEmails || []
+                            }
                           />
                         ),
                       )
