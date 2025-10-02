@@ -30,12 +30,11 @@ export async function POST(req: Request) {
     const token = req.headers.get("authorization")?.split("Bearer ")[1];
     const { email, permission } = await req.json();
 
-    if (!token) {
+    if (!token)
       return NextResponse.json(
         { error: "Token is required!" },
         { status: 400 },
       );
-    }
 
     const decoded = await adminAuth.verifyIdToken(token);
 
@@ -54,50 +53,63 @@ export async function POST(req: Request) {
     const myEmotionSetsData = myEmotionSets.data();
     const myCollaborators = myEmotionSetsData.sharedWith;
 
-    if (myEmotionSetsData.ownerEmail !== email) {
-      const emotionSets = await adminDb
-        .collection("emotion-sets")
-        .where("ownerEmail", "==", email)
-        .get();
-
-      if (!emotionSets.docs[0].exists) {
-        return NextResponse.json({ error: "Not found!" }, { status: 404 });
-      }
-
-      const collaboratorId = emotionSets.docs[0].data().ownerId;
-
-      const [invite_a, invite_b] = await Promise.all([
-        adminDb
-          .collection("invites")
-          .where("from", "==", decoded.uid)
-          .where("to", "==", collaboratorId)
-          .limit(1)
-          .get(),
-        adminDb
-          .collection("invites")
-          .where("from", "==", collaboratorId)
-          .where("to", "==", decoded.uid)
-          .limit(1)
-          .get(),
-      ]);
-
-      const invites = [...invite_a.docs, ...invite_b.docs];
-
-      const res = await adminDb.collection("invites").add({
-        from: decoded.uid,
-        to: collaboratorId,
-        senderInfo: {
-          name: decoded.name,
-          permission: permission,
-          email: email,
-        },
-      });
-      return NextResponse.json({ ok: true, id: res.id });
-    } else
+    if (myEmotionSetsData.ownerEmail === email)
       return NextResponse.json(
         { error: "You can't invite yourself!" },
         { status: 409 },
       );
+
+    const emotionSets = await adminDb
+      .collection("emotion-sets")
+      .where("ownerEmail", "==", email)
+      .get();
+
+    if (!emotionSets.docs[0].exists) {
+      return NextResponse.json({ error: "Not found!" }, { status: 404 });
+    }
+
+    const collaboratorId = emotionSets.docs[0].data().ownerId;
+
+    const [invite_a, invite_b] = await Promise.all([
+      adminDb
+        .collection("invites")
+        .where("from", "==", decoded.uid)
+        .where("to", "==", collaboratorId)
+        .limit(1)
+        .get(),
+      adminDb
+        .collection("invites")
+        .where("from", "==", collaboratorId)
+        .where("to", "==", decoded.uid)
+        .limit(1)
+        .get(),
+    ]);
+
+    const invites = [...invite_a.docs, ...invite_b.docs];
+
+    if (invites.length)
+      return NextResponse.json(
+        { error: "Invite already exist!" },
+        { status: 409 },
+      );
+
+    if (myCollaborators.some(({ uid }: SenderInfo) => uid === collaboratorId))
+      return NextResponse.json(
+        { error: "Collaborator already added!" },
+        { status: 409 },
+      );
+
+    const res = await adminDb.collection("invites").add({
+      from: decoded.uid,
+      to: collaboratorId,
+      senderInfo: {
+        name: decoded.name,
+        permission: permission,
+        email: email,
+      },
+    });
+
+    return NextResponse.json({ ok: true, id: res.id });
   } catch (err) {
     return NextResponse.json({ error: "Invalid request!" }, { status: 400 });
   }
