@@ -9,10 +9,17 @@ import { auth } from "@/lib/firebase";
 import { SenderInfo } from "@/lib/type";
 import { cn } from "@/lib/utils";
 import { signOut } from "firebase/auth";
-import { HatGlasses, LogOut, UserRoundPlus, Waypoints } from "lucide-react";
+import {
+  HatGlasses,
+  LogOut,
+  ScanQrCode,
+  UserRoundPlus,
+  Waypoints,
+} from "lucide-react";
 import moment from "moment";
 import Image from "next/image";
 import { PuffLoader } from "react-spinners";
+import MyQRCodeDialog from "../../components/blocks/qrcode-dialog";
 import CllaboratorCard from "./ui/collaborator-card";
 
 export default function Profile() {
@@ -60,13 +67,21 @@ export default function Profile() {
                   <b>Collaborators</b>
                 </div>
 
-                <CollaboratorDialog
-                  emails={collaboratorsQuery.data?.collaboratorsEmails || []}
-                >
-                  <Button size={"icon"} variant={"secondary"}>
-                    <UserRoundPlus />
-                  </Button>
-                </CollaboratorDialog>
+                <div className="flex gap-3">
+                  <MyQRCodeDialog>
+                    <Button size={"icon"} variant={"secondary"}>
+                      <ScanQrCode />
+                    </Button>
+                  </MyQRCodeDialog>
+
+                  <CollaboratorDialog
+                    emails={collaboratorsQuery.data?.collaboratorsEmails || []}
+                  >
+                    <Button size={"icon"} variant={"secondary"}>
+                      <UserRoundPlus />
+                    </Button>
+                  </CollaboratorDialog>
+                </div>
               </CardHeader>
               <CardContent
                 className={cn(

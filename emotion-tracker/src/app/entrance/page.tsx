@@ -10,6 +10,7 @@ import {
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { BeatLoader } from "react-spinners";
 
 export default function GoogleSignInButton() {
   const router = useRouter();
@@ -40,12 +41,16 @@ export default function GoogleSignInButton() {
       });
 
       // Редирект на dashboard
-      router.replace("/dashboard");
+      if (
+        document.referrer.includes(`${window.location.origin}/entrance/qrcode`)
+      )
+        router.back();
+      else router.replace("/dashboard");
     } catch (err: any) {
       console.error(err);
+      setRedirect(false);
       alert(err.message ?? "Login failed");
     } finally {
-      setRedirect(false);
     }
   };
 
@@ -53,8 +58,9 @@ export default function GoogleSignInButton() {
     <main className="flex h-full w-full items-center justify-center">
       <section className="flex flex-col items-center gap-6">
         {redirect ? (
-          <div className="animate-pulse text-3xl font-[700]">
-            Redirecting...
+          <div className="flex items-center justify-center gap-2">
+            <b className="text-primary animate-pulse text-3xl">Redirecting</b>
+            <BeatLoader size={10} className="mt-3 dark:invert" />
           </div>
         ) : (
           <>

@@ -9,6 +9,8 @@ import {
 } from "@/lib/controllers/emotions-controller";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useFirebaseUser } from "./useFirebaseUser";
+import { toast } from "sonner";
+import { errorToast } from "@/lib/func";
 
 export function useEmotions(options?: {
   user_id?: string | undefined;
@@ -60,7 +62,12 @@ export function useEmotions(options?: {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["emotions"] }); // рефетч
       queryClient.invalidateQueries({ queryKey: ["emotions-range"] }); // рефетч
+      toast.success("The entry has been added successfully", {
+        className: "!bg-green-500/50 !border-green-600 !backdrop-blur-sm",
+        duration: 3000,
+      });
     },
+    onError: errorToast,
   });
 
   const updateMutation = useMutation({
@@ -68,7 +75,12 @@ export function useEmotions(options?: {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["emotions"] }); // рефетч
       queryClient.invalidateQueries({ queryKey: ["emotions-range"] }); // рефетч
+      toast.success("The entry has been updated successfully", {
+        className: "!bg-green-500/50 !border-green-600 !backdrop-blur-sm",
+        duration: 3000,
+      });
     },
+    onError: errorToast,
   });
 
   const deleteMutation = useMutation({
@@ -76,7 +88,12 @@ export function useEmotions(options?: {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["emotions"] }); // рефетч
       queryClient.invalidateQueries({ queryKey: ["emotions-range"] }); // рефетчфетч
+      toast.success("The entry has been deleted", {
+        className: "!bg-green-500/50 !border-green-600 !backdrop-blur-sm",
+        duration: 3000,
+      });
     },
+    onError: errorToast,
   });
 
   return {

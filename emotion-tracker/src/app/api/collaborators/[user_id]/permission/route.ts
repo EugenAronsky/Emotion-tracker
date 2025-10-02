@@ -10,7 +10,7 @@ export async function GET(
   try {
     const token = req.headers.get("authorization")?.split("Bearer ")[1];
     if (!token)
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized!" }, { status: 401 });
     const decoded = await adminAuth.verifyIdToken(token);
 
     const collaborators = await adminDb
@@ -27,7 +27,7 @@ export async function GET(
 
     if (me) return NextResponse.json({ permission: me.permission });
 
-    return NextResponse.json({ error: "User not found" }, { status: 404 });
+    return NextResponse.json({ error: "User not found!" }, { status: 404 });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 400 });
   }

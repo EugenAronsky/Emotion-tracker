@@ -1,23 +1,37 @@
+import { CollaboratorInviteProps } from "@/components/blocks/collaborator-dialog";
 import { auth } from "@/lib/firebase";
-import { CollaboratorForm, InviteProps } from "../type";
 import { errorHandler } from "../func";
+import { InviteProps, Permission } from "../type";
 
 // Получить приглашения
 async function getInvites() {
   const token = await auth.currentUser?.getIdToken();
   if (!token) throw new Error("Not authenticated");
-  //   const token = await user.getIdToken(); // ✅ гарантированно не undefined
   const res = await fetch("/api/invites", {
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
   });
-
   return errorHandler(res);
 }
 
-async function inviteCollaborator(data: CollaboratorForm) {
+async function getQrCodeInvites(permission: Permission, signal: AbortSignal) {
+  const token = await auth.currentUser?.getIdToken();
+  if (!token) throw new Error("Not authenticated");
+  const res = await fetch("/api/invites/qrcode", {
+    method: "GET",
+    signal: signal,
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+      permission: permission || "observer",
+    },
+  });
+  return errorHandler(res);
+}
+
+async function inviteCollaborator(data: CollaboratorInviteProps) {
   const token = await auth.currentUser?.getIdToken();
   if (!token) throw new Error("Not authenticated");
   const res = await fetch("/api/invites", {
@@ -28,7 +42,6 @@ async function inviteCollaborator(data: CollaboratorForm) {
     },
     body: JSON.stringify(data),
   });
-
   return errorHandler(res);
 }
 
@@ -43,7 +56,22 @@ async function confirmInvite(data: InviteProps) {
     },
     body: JSON.stringify(data),
   });
+  return errorHandler(res);
+}
 
+async function confirmQRCodeInvite(id: string) {
+  const token = await auth.currentUser?.getIdToken();
+  if (!token) {
+    window.location.pathname = "/entrance";
+    throw new Error("Not authenticated");
+  }
+  const res = await fetch(`/api/invites/qrcode/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
   return errorHandler(res);
 }
 
@@ -57,8 +85,14 @@ async function denyInvite(id: string) {
       Authorization: `Bearer ${token}`,
     },
   });
-
   return errorHandler(res);
 }
 
-export { inviteCollaborator, getInvites, confirmInvite, denyInvite };
+export {
+  getInvites,
+  denyInvite,
+  confirmInvite,
+  getQrCodeInvites,
+  inviteCollaborator,
+  confirmQRCodeInvite,
+};

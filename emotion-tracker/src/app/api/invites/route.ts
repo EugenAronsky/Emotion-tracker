@@ -1,11 +1,12 @@
 import { adminAuth, adminDb } from "@/lib/firebaseAdmin";
+import { SenderInfo } from "@/lib/type";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
   try {
     const token = req.headers.get("authorization")?.split("Bearer ")[1];
     if (!token)
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized!" }, { status: 401 });
     const decoded = await adminAuth.verifyIdToken(token);
 
     const invites = await adminDb
@@ -30,7 +31,10 @@ export async function POST(req: Request) {
     const { email, permission } = await req.json();
 
     if (!token) {
-      return NextResponse.json({ error: "Token is required" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Token is required!" },
+        { status: 400 },
+      );
     }
 
     const decoded = await adminAuth.verifyIdToken(token);
@@ -44,7 +48,7 @@ export async function POST(req: Request) {
     const myEmotionSets = snap.docs[0];
 
     if (!myEmotionSets.exists) {
-      return NextResponse.json({ error: "Not found" }, { status: 404 });
+      return NextResponse.json({ error: "Not found!" }, { status: 404 });
     }
 
     const myEmotionSetsData = myEmotionSets.data();
@@ -57,38 +61,44 @@ export async function POST(req: Request) {
         .get();
 
       if (!emotionSets.docs[0].exists) {
-        return NextResponse.json({ error: "Not found" }, { status: 404 });
+        return NextResponse.json({ error: "Not found!" }, { status: 404 });
       }
 
       const collaboratorId = emotionSets.docs[0].data().ownerId;
 
-      const invites = await adminDb
-        .collection("invites")
-        .where("from", "==", decoded.uid)
-        .where("to", "==", collaboratorId)
-        .get();
+      const [invite_a, invite_b] = await Promise.all([
+        adminDb
+          .collection("invites")
+          .where("from", "==", decoded.uid)
+          .where("to", "==", collaboratorId)
+          .limit(1)
+          .get(),
+        adminDb
+          .collection("invites")
+          .where("from", "==", collaboratorId)
+          .where("to", "==", decoded.uid)
+          .limit(1)
+          .get(),
+      ]);
 
-      if (!myCollaborators.includes(collaboratorId) && !invites.docs[0]?.exists)
-        await adminDb.collection("invites").add({
-          from: decoded.uid,
-          to: collaboratorId,
-          senderInfo: {
-            name: decoded.name,
-            picture: decoded.picture,
-            permission: permission,
-            email: email,
-          },
-        });
-      else
-        return NextResponse.json({ error: "Already exist" }, { status: 409 });
+      const invites = [...invite_a.docs, ...invite_b.docs];
+
+      const res = await adminDb.collection("invites").add({
+        from: decoded.uid,
+        to: collaboratorId,
+        senderInfo: {
+          name: decoded.name,
+          permission: permission,
+          email: email,
+        },
+      });
+      return NextResponse.json({ ok: true, id: res.id });
     } else
       return NextResponse.json(
-        { error: "You can't add yourself" },
+        { error: "You can't invite yourself!" },
         { status: 409 },
       );
-
-    return NextResponse.json({ ok: true });
   } catch (err) {
-    return NextResponse.json({ error: "Invalid request" }, { status: 400 });
+    return NextResponse.json({ error: "Invalid request!" }, { status: 400 });
   }
 }

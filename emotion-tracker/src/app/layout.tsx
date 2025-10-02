@@ -4,6 +4,7 @@ import "./globals.css";
 import { Providers } from "./providers";
 import { ThemeProvider } from "next-themes";
 import MotionPageWrapper from "@/components/blocks/motion-page-wrapper";
+import { Toaster } from "@/components/ui/sonner";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -49,7 +50,10 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <Providers>
-            <MotionPageWrapper>{children}</MotionPageWrapper>
+            <MotionPageWrapper>
+              {children}
+              <Toaster />
+            </MotionPageWrapper>
           </Providers>
         </ThemeProvider>
       </body>

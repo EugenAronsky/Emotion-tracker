@@ -7,6 +7,8 @@ import {
   removeCollaborator,
   updateCollaborator,
 } from "@/lib/controllers/collaborators-controller";
+import { toast } from "sonner";
+import { errorToast } from "@/lib/func";
 
 export function useCollaborators(options?: { user_id?: string | undefined }) {
   const queryClient = useQueryClient();
@@ -33,20 +35,31 @@ export function useCollaborators(options?: { user_id?: string | undefined }) {
     onSuccess: () => {
       queryClient.refetchQueries({ queryKey: ["collaborators"] }); // рефетч
     },
+    onError: errorToast,
   });
 
   const removeCollaboratorMutation = useMutation({
     mutationFn: removeCollaborator,
     onSuccess: () => {
       queryClient.refetchQueries({ queryKey: ["collaborators"] }); // рефетч
+      toast.success("Unsubscribed successfully", {
+        className: "!bg-green-500/50 !border-green-600 !backdrop-blur-sm",
+        duration: 3000,
+      });
     },
+    onError: errorToast,
   });
 
   const updateCollaboratorMutation = useMutation({
     mutationFn: updateCollaborator,
     onSuccess: () => {
       queryClient.refetchQueries({ queryKey: ["collaborators"] }); // рефетч
+      toast.success("Collaborator has been updated", {
+        className: "!bg-green-500/50 !border-green-600 !backdrop-blur-sm",
+        duration: 3000,
+      });
     },
+    onError: errorToast,
   });
 
   return {

@@ -38,7 +38,6 @@ export default function Statistics({
   }, []);
   const { loading } = useFirebaseUser();
   const [fromDate, setFromDate] = useState<number>(defaultFromDate);
-  const [slogan, setSlogan] = useState<string | undefined>();
   const [pieChartData, setPieChartData] = useState<
     Array<{ name: string; value: number }>
   >([]);
@@ -57,13 +56,6 @@ export default function Statistics({
   const sortedPieChartData = structuredClone(pieChartData).sort((a, b) =>
     b.value > a.value ? 1 : -1,
   );
-
-  // const { slogonQuery } = useGemini({
-  //   slogonQueryParams: {
-  //     emotion: sortedPieChartData.at(0)?.name || "",
-  //     prev_context: slogan,
-  //   },
-  // });
 
   useEffect(() => {
     if (query.isSuccess) {
@@ -121,21 +113,6 @@ export default function Statistics({
     }
   };
 
-  // useEffect(() => {
-  //   Boolean(senderInfo)
-  //     ? queryClient.refetchQueries({
-  //         queryKey: ["emotions-range-by-user-id", senderInfo?.uid],
-  //       })
-  //     : queryClient.refetchQueries({ queryKey: ["emotions-range"] });
-  // }, [fromDate]);
-
-  // useEffect(() => {
-  //   if (!slogonQuery.data) slogonQuery.refetch();
-  //   else setSlogan(slogonQuery.data.slogon);
-  // }, [slogonQuery.data]);
-
-  // const AskAI = () => !slogonQuery.isFetching && slogonQuery.refetch();
-
   return (
     <NavWrapper hidden={Boolean(senderInfo)}>
       <Tabs
@@ -173,22 +150,6 @@ export default function Statistics({
               permission={permission}
               sortedPieChartData={sortedPieChartData}
             />
-
-            {/* <Card onClick={AskAI} className="w-full border-none">
-              <CardContent className="text-center">
-                {slogonQuery.isFetching ? (
-                  <div className="flex h-full w-full flex-col items-center justify-center rounded-md !shadow-none">
-                    <ScaleLoader color="#3b82f6" />
-                  </div>
-                ) : (
-                  <i className="pointer-events-none">
-                    {slogonQuery.data.slogon
-                      ?.replaceAll("*", "")
-                      .replaceAll('"', "")}
-                  </i>
-                )}
-              </CardContent>
-            </Card> */}
           </>
         ) : (
           <div className="flex grow flex-col items-center justify-center opacity-60">

@@ -1,5 +1,5 @@
 import { adminAuth, adminDb } from "@/lib/firebaseAdmin";
-import { InviteProps } from "@/lib/type";
+import { InviteProps, SenderInfo } from "@/lib/type";
 import { NextRequest, NextResponse } from "next/server";
 
 function isDuplicates(arr: Array<Record<string, any>>, key: string) {
@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
   try {
     const token = req.headers.get("authorization")?.split("Bearer ")[1];
     if (!token)
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized!" }, { status: 401 });
     const decoded = await adminAuth.verifyIdToken(token);
 
     const emotionSets = await adminDb.collection("emotion-sets").get();
@@ -28,14 +28,12 @@ export async function GET(req: NextRequest) {
       .map((doc) => {
         const data = doc.data();
         const index = myCollaborators.findIndex(
-          (senderInfo: { name: string; picture: string; uid: string }) =>
-            senderInfo.uid === data.ownerId,
+          ({ uid }: SenderInfo) => uid === data.ownerId,
         );
 
         if (index === -1) return data.ownerEmail;
         else return null;
       })
-
       .filter((email) => email !== decoded.email && email !== null);
 
     return NextResponse.json({
@@ -53,7 +51,10 @@ export async function POST(req: Request) {
     const { from, senderInfo, id } = (await req.json()) as InviteProps;
 
     if (!token) {
-      return NextResponse.json({ error: "Token is required" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Token is required!" },
+        { status: 400 },
+      );
     }
 
     const decoded = await adminAuth.verifyIdToken(token);
@@ -75,7 +76,7 @@ export async function POST(req: Request) {
       const FromEmotionSetDoc = FromEmotionSet.docs[0];
 
       if (!FromEmotionSetDoc.exists || !ToEmotionSetDoc.exists) {
-        return NextResponse.json({ error: "Not found" }, { status: 404 });
+        return NextResponse.json({ error: "Not found!" }, { status: 404 });
       }
 
       const FromEmotionSetRef = FromEmotionSetDoc.ref;
@@ -117,24 +118,30 @@ export async function POST(req: Request) {
         const doc = await docRef.get();
 
         if (!doc.exists) {
-          return NextResponse.json({ error: "Not found" }, { status: 404 });
+          return NextResponse.json(
+            { error: "Invite not found" },
+            { status: 404 },
+          );
         }
 
         if (doc.data()?.to !== decoded.uid) {
-          return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+          return NextResponse.json({ error: "Forbidden!" }, { status: 403 });
         }
 
         await docRef.delete();
       } else
-        return NextResponse.json({ error: "Already exist" }, { status: 409 });
+        return NextResponse.json(
+          { error: "The user has already been added!" },
+          { status: 409 },
+        );
     } else
       return NextResponse.json(
-        { error: "You can't add yourself" },
+        { error: "You can't add yourself!" },
         { status: 409 },
       );
 
     return NextResponse.json({ ok: true });
   } catch (err) {
-    return NextResponse.json({ error: "Invalid request" }, { status: 400 });
+    return NextResponse.json({ error: "Invalid request!" }, { status: 400 });
   }
 }

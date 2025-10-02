@@ -9,7 +9,7 @@ export async function GET(req: NextRequest) {
     const fromDate = req.nextUrl.searchParams.get("fromDate");
     const token = req.headers.get("authorization")?.split("Bearer ")[1];
     if (!token)
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized!" }, { status: 401 });
 
     const decoded = await adminAuth.verifyIdToken(token);
 
@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
     const decoded = await adminAuth.verifyIdToken(token);
 
     // Сохраняем в Firestore
-    if (decoded.uid === undefined) throw new Error("No UID in token");
+    if (decoded.uid === undefined) throw new Error("Invalid token!");
 
     await adminDb.collection("emotions").add({
       uid: decoded.uid,

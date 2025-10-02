@@ -6,7 +6,10 @@ export async function POST(req: Request) {
     const { token } = await req.json();
 
     if (!token) {
-      return NextResponse.json({ error: "Token is required" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Token is required!" },
+        { status: 400 },
+      );
     }
 
     const decoded = await adminAuth.verifyIdToken(token);
@@ -36,6 +39,6 @@ export async function POST(req: Request) {
 
     return res;
   } catch (err) {
-    return NextResponse.json({ error: "Invalid request" }, { status: 400 });
+    return NextResponse.json({ error: "Invalid request!" }, { status: 400 });
   }
 }

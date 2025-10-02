@@ -1,5 +1,5 @@
+import { CollaboratorInviteProps } from "@/components/blocks/collaborator-dialog";
 import { auth } from "@/lib/firebase";
-import { CollaboratorForm } from "../type";
 import { errorHandler } from "../func";
 
 // Получить колобараторов
@@ -27,7 +27,7 @@ async function getPermissionByCollaboratorUid(user_id?: string) {
   return errorHandler(res);
 }
 
-async function addCollaborator(data: CollaboratorForm) {
+async function addCollaborator(data: CollaboratorInviteProps) {
   const token = await auth.currentUser?.getIdToken();
   if (!token) throw new Error("Not authenticated");
   const res = await fetch("/api/collaborators", {
@@ -47,7 +47,7 @@ async function updateCollaborator({
   permission,
 }: {
   user_id: string;
-  permission: Partial<CollaboratorForm["permission"]>;
+  permission: Partial<CollaboratorInviteProps["permission"]>;
 }) {
   const token = await auth.currentUser?.getIdToken();
   if (!token) throw new Error("Not authenticated");
@@ -74,9 +74,9 @@ async function removeCollaborator(user_id: string) {
 }
 
 export {
-  getCollaborators,
   addCollaborator,
+  getCollaborators,
+  getPermissionByCollaboratorUid,
   removeCollaborator,
   updateCollaborator,
-  getPermissionByCollaboratorUid,
 };

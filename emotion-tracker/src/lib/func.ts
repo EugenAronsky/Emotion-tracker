@@ -1,4 +1,5 @@
 import * as htmlToImage from "html-to-image";
+import { toast } from "sonner";
 
 let isSharing = false;
 
@@ -36,7 +37,7 @@ const errorHandler = async (res: Response) => {
     let errMsg = "Request failed";
     try {
       const errData = await res.json();
-      errMsg = errData.message || JSON.stringify(errData);
+      errMsg = errData.error || JSON.stringify(errData);
     } catch {
       errMsg = await res.text();
     }
@@ -45,4 +46,11 @@ const errorHandler = async (res: Response) => {
   return res.json();
 };
 
-export { shareScreenshot, errorHandler };
+const errorToast = ({ message }: { message: string }) => {
+  toast.error(message, {
+    className: "!bg-red-500/50 !border-red-600 !backdrop-blur-sm",
+    duration: 5000,
+  });
+};
+
+export { shareScreenshot, errorHandler, errorToast };

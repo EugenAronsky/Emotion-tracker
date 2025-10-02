@@ -14,11 +14,11 @@ export async function PUT(
     const doc = await docRef.get();
 
     if (!doc.exists) {
-      return NextResponse.json({ error: "Not found" }, { status: 404 });
+      return NextResponse.json({ error: "Entry not found!" }, { status: 404 });
     }
 
     if (doc.data()?.uid !== decoded.uid) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return NextResponse.json({ error: "Forbidden!" }, { status: 403 });
     }
 
     await docRef.update(updateData);
@@ -36,7 +36,7 @@ export async function DELETE(
   try {
     const token = req.headers.get("authorization")?.split("Bearer ")[1];
     if (!token)
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized!" }, { status: 401 });
 
     const decoded = await adminAuth.verifyIdToken(token);
 
@@ -44,11 +44,11 @@ export async function DELETE(
     const doc = await docRef.get();
 
     if (!doc.exists) {
-      return NextResponse.json({ error: "Not found" }, { status: 404 });
+      return NextResponse.json({ error: "Entry not found!" }, { status: 404 });
     }
 
     if (doc.data()?.uid !== decoded.uid) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return NextResponse.json({ error: "Forbidden!" }, { status: 403 });
     }
 
     await docRef.delete();

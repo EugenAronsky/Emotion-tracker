@@ -14,11 +14,6 @@ export type EmotionReturnProps = EmotionForm & {
   id: string;
 };
 
-export type CollaboratorForm = {
-  email: string;
-  permission: Permission;
-};
-
 export type InviteProps = {
   id: string;
   from: string;

@@ -12,7 +12,7 @@ async function deleteCollaborators(uid: string, user_id: string) {
   const doc = collaborators.docs[0];
 
   if (!doc.exists) {
-    return NextResponse.json({ error: "Not found" }, { status: 404 });
+    return NextResponse.json({ error: "Not found!" }, { status: 404 });
   }
   const docData = doc.data();
   const myUpdatedCollaborators = docData.sharedWith.filter(
@@ -40,7 +40,7 @@ export async function PUT(
     const doc = collaborators.docs[0];
 
     if (!doc.exists) {
-      return NextResponse.json({ error: "Not found" }, { status: 404 });
+      return NextResponse.json({ error: "Not found!" }, { status: 404 });
     }
 
     const docData = doc.data();
@@ -74,7 +74,7 @@ export async function DELETE(
   try {
     const token = req.headers.get("authorization")?.split("Bearer ")[1];
     if (!token)
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized!" }, { status: 401 });
 
     const decoded = await adminAuth.verifyIdToken(token);
 

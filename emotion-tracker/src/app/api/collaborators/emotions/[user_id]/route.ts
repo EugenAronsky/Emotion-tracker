@@ -13,7 +13,7 @@ export async function GET(
     const fromDate = req.nextUrl.searchParams.get("fromDate");
     const token = req.headers.get("authorization")?.split("Bearer ")[1];
     if (!token)
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized!" }, { status: 401 });
 
     const decoded = await adminAuth.verifyIdToken(token);
 
@@ -26,7 +26,7 @@ export async function GET(
     const EmotionSetDoc = emotionSets.docs[0];
 
     if (!EmotionSetDoc.exists) {
-      return NextResponse.json({ error: "Not found" }, { status: 404 });
+      return NextResponse.json({ error: "Entry not found!" }, { status: 404 });
     }
 
     const EmotionSetData = EmotionSetDoc.data();

@@ -9,9 +9,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { useCollaborators } from "@/hooks/useCollaborators";
 import { useInvites } from "@/hooks/useInvite";
-import { CollaboratorForm } from "@/lib/type";
 import { cn } from "@/lib/utils";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Check,
   ChevronsUpDown,
@@ -23,6 +24,7 @@ import {
 import { useEffect, useState } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { PuffLoader } from "react-spinners";
+import * as z from "zod";
 import {
   Command,
   CommandEmpty,
@@ -34,7 +36,15 @@ import {
 import { Label } from "../ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
-import { useCollaborators } from "@/hooks/useCollaborators";
+
+const CollaboratorInviteSchema = z
+  .object({
+    email: z.string().nonempty({ message: "Shop category is required!" }),
+    permission: z.enum(["observer", "viewer", "reader"]),
+  })
+  .required();
+
+export type CollaboratorInviteProps = z.infer<typeof CollaboratorInviteSchema>;
 
 export function CollaboratorDialog({
   defaultData,
@@ -43,7 +53,9 @@ export function CollaboratorDialog({
 }: {
   emails: Array<string>;
   children?: React.ReactNode;
-  defaultData?: (CollaboratorForm & { uid: string; name: string }) | undefined;
+  defaultData?:
+    | (CollaboratorInviteProps & { uid: string; name: string })
+    | undefined;
 }) {
   const [open, setOpen] = useState(false);
   const { inviteCollaboratorMutation } = useInvites();
@@ -63,7 +75,9 @@ export function CollaboratorDialog({
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<CollaboratorForm>();
+  } = useForm<CollaboratorInviteProps>({
+    resolver: zodResolver(CollaboratorInviteSchema),
+  });
 
   useEffect(() => reset(defaultValues), [defaultData]);
 
@@ -73,18 +87,21 @@ export function CollaboratorDialog({
     setValue("");
   };
 
-  const onSubmit: SubmitHandler<CollaboratorForm> = async (data) => {
+  const onSubmit: SubmitHandler<CollaboratorInviteProps> = async (data) => {
     defaultData !== undefined
       ? updateCollaboratorMutation.mutate(
           { permission: data.permission, user_id: defaultData.uid },
           { onSuccess: () => close() },
         )
-      : inviteCollaboratorMutation.mutate(data, { onSuccess: () => close() });
+      : inviteCollaboratorMutation.mutate(data, {
+          onSuccess: () => close(),
+        });
   };
 
   return (
     <Dialog
       onOpenChange={(value) => {
+        reset(defaultValues);
         setOpen(value);
         setValue("");
       }}
@@ -131,7 +148,11 @@ export function CollaboratorDialog({
                     role="combobox"
                     variant="outline"
                     aria-expanded={openPopover}
-                    className="w-full justify-between"
+                    className={cn(
+                      "w-full justify-between",
+                      Boolean(errors.email?.message) &&
+                        "dark:!border-destructive dark:!bg-destructive/20 !bg-destructive/10 !border-destructive/50",
+                    )}
                   >
                     {defaultData?.email
                       ? defaultData?.email
@@ -192,7 +213,7 @@ export function CollaboratorDialog({
               <RadioGroup
                 {...field}
                 onValueChange={field.onChange}
-                className="*:border-input flex gap-3 *:flex *:h-9 *:w-full *:items-center *:justify-center *:rounded-md *:border *:px-3 *:py-1.5"
+                className="*:border-input flex gap-3 *:flex *:h-9 *:w-full *:items-center *:justify-center *:rounded-md *:border *:px-3 *:py-1.5 *:text-sm"
               >
                 <Label
                   className={cn(

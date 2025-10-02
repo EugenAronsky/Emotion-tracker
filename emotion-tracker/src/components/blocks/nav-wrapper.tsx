@@ -1,13 +1,15 @@
-import { ChartArea, Layout, Moon, Settings, Sun, User2 } from "lucide-react";
-import { Button } from "../ui/button";
-import Link from "next/link";
-import { useTheme } from "next-themes";
+"use client";
+
 import { useFirebaseUser } from "@/hooks/useFirebaseUser";
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { useInvites } from "@/hooks/useInvite";
-import { InviteDialog } from "./invite-dialog";
 import { InviteProps } from "@/lib/type";
+import { ChartArea, Layout, Moon, Sun, User2 } from "lucide-react";
+import { useTheme } from "next-themes";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { Button } from "../ui/button";
+import { InviteDialog } from "./invite-dialog";
 
 export default function NavWrapper({
   hidden,
@@ -17,13 +19,32 @@ export default function NavWrapper({
   children?: React.ReactNode;
 }) {
   const router = useRouter();
+  const { invitesQuery } = useInvites();
   const { theme, setTheme } = useTheme();
   const { user, loading } = useFirebaseUser();
-  const { invitesQuery } = useInvites();
+  const [mounted, setMounted] = useState(false);
+  const [queue, setQueue] = useState<Array<{ open: boolean; number: number }>>(
+    [],
+  );
 
   useEffect(() => {
     !user && !loading && router.push("/entrance");
   }, [user, loading]);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    setQueue(
+      Array.from({ length: invitesQuery.data?.length }).map((_, index) => ({
+        open: false,
+        number: index,
+      })),
+    );
+
+    console.log(invitesQuery.data);
+  }, [invitesQuery.data]);
 
   return (
     <main className="flex h-full w-full flex-col overflow-hidden">
@@ -39,12 +60,12 @@ export default function NavWrapper({
             theme === "light" ? setTheme("dark") : setTheme("light")
           }
         >
-          {theme === "light" ? <Sun /> : <Moon />}
+          {mounted && theme === "light" ? <Sun /> : <Moon />}
         </Button>
       </header>
       <section className="flex grow px-6 pb-6">{children}</section>
       <footer
-        className="flex h-fit w-full items-center justify-around gap-4 border-t px-6 pt-3 pb-0 *:*:grow *:grow"
+        className="flex h-fit w-full items-center justify-around gap-4 border-t px-6 py-3 *:*:grow *:grow"
         hidden={hidden}
       >
         <Link href="/dashboard" className="flex items-center">
@@ -65,10 +86,20 @@ export default function NavWrapper({
           </Button>
         </Link>
       </footer>
-      {invitesQuery.data &&
-        invitesQuery.data.map((invite: InviteProps, index: number) => (
-          <InviteDialog key={`invite-${index}`} data={invite} />
-        ))}
+
+      {queue.length && invitesQuery.data[0] ? (
+        <InviteDialog
+          key={`invite-${queue.at(0)?.number}`}
+          data={invitesQuery.data[0]}
+          onInteractionEnd={() =>
+            setQueue(
+              JSON.parse(
+                JSON.stringify(queue.filter((_, index) => index !== 0)),
+              ),
+            )
+          }
+        />
+      ) : null}
     </main>
   );
 }

@@ -1,6 +1,7 @@
 // src/app/providers.tsx
 "use client";
 
+import { errorToast } from "@/lib/func";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactNode, useState } from "react";
 

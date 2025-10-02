@@ -105,7 +105,7 @@ export default function CllaboratorCard({
             )}
           >
             {emotionsByUserIdAndByRangeQuery.isLoading ? (
-              <LoaderCircle className="text-secondary animate-spin" />
+              <LoaderCircle className="text-primary/50 animate-spin" />
             ) : emotionsByUserIdAndByRangeQuery.data?.length ? (
               <>{Emotion[emotion as EmotionForm["emotion"]]}</>
             ) : (

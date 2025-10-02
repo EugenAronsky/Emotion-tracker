@@ -9,19 +9,20 @@ export async function DELETE(
   try {
     const token = req.headers.get("authorization")?.split("Bearer ")[1];
     if (!token)
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized!" }, { status: 401 });
 
     const decoded = await adminAuth.verifyIdToken(token);
 
     const docRef = adminDb.collection("invites").doc(id);
     const doc = await docRef.get();
+    const docData = doc.data();
 
     if (!doc.exists) {
-      return NextResponse.json({ error: "Not found" }, { status: 404 });
+      return NextResponse.json({ error: "Not found!" }, { status: 404 });
     }
 
-    if (doc.data()?.to !== decoded.uid) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    if (docData?.to !== decoded.uid && docData?.from !== decoded.uid) {
+      return NextResponse.json({ error: "Forbidden!" }, { status: 403 });
     }
 
     await docRef.delete();
