@@ -85,7 +85,7 @@ function MyQRCodeDialog({ children }: { children: React.ReactNode }) {
             >
               <QRCodeSVG
                 className="size-full rounded-md"
-                value={QRCodeInviteQuery.data.QRCodeURL}
+                value={`${window.location.origin}${QRCodeInviteQuery.data.QRCodeURL}`}
                 level="H" // Error correction level (L, M, Q, H)
                 bgColor={
                   permission === "reader"
