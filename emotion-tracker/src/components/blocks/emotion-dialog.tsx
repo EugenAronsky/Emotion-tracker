@@ -228,7 +228,7 @@ export function EmotionDialog({
                       emotions[value as keyof typeof emotions]?.at(0) || "",
                     );
                 }}
-                className="*:bg-secondary flex justify-between gap-3 border-b pb-4 *:flex *:size-14 *:items-center *:justify-center *:rounded-full *:max-[400px]:size-12 *:max-[400px]:text-3xl"
+                className="*:bg-secondary flex justify-between gap-3 border-b pb-4 *:flex *:size-14 *:items-center *:justify-center *:rounded-full *:max-[400px]:size-12 *:max-[400px]:text-3xl max-[361px]:gap-2"
               >
                 <Label
                   className={cn(
@@ -291,7 +291,7 @@ export function EmotionDialog({
               <RadioGroup
                 {...field}
                 onValueChange={field.onChange}
-                className="*:bg-secondary flex flex-wrap gap-2 *:max-[400px]:text-sm"
+                className="*:bg-secondary flex flex-wrap justify-center gap-2 *:max-[400px]:text-sm"
               >
                 {emotions[mood as keyof typeof emotions]?.map((emotion) => (
                   <Label
