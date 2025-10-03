@@ -5,7 +5,7 @@ import { Calendar, CalendarDayButton } from "@/components/ui/calendar";
 import { Card, CardContent } from "@/components/ui/card";
 import { useEmotions } from "@/hooks/useEmotions";
 import { useFirebaseUser } from "@/hooks/useFirebaseUser";
-import { Emotion } from "@/lib/enums";
+import { Mood } from "@/lib/enums";
 import { EmotionReturnProps, Permission, SenderInfo } from "@/lib/type";
 import { cn } from "@/lib/utils";
 import moment from "moment";
@@ -84,15 +84,15 @@ export default function Dashboard({
                       "text-md !rounded-full",
                       "group-data-[focused=true]/day:!ring-[0px] data-[selected-single=true]:bg-primary",
                       dayEmotion && "data-[selected-single=true]:text-white",
-                      dayEmotion && dayEmotion.emotion === "Anger"
+                      dayEmotion && dayEmotion.mood === "Awful"
                         ? "bg-red-200  text-red-600 data-[selected-single=true]:bg-red-500"
-                        : dayEmotion && dayEmotion.emotion === "Sadness"
+                        : dayEmotion && dayEmotion.mood === "Bad"
                           ? "bg-blue-200 text-blue-600 data-[selected-single=true]:bg-blue-500"
-                          : dayEmotion && dayEmotion.emotion === "Disgust"
+                          : dayEmotion && dayEmotion.mood === "Normal"
                             ? "bg-yellow-200 text-yellow-600 data-[selected-single=true]:bg-yellow-500"
-                            : dayEmotion && dayEmotion.emotion === "Joy"
+                            : dayEmotion && dayEmotion.mood === "Good"
                               ? "bg-green-200 text-green-600  data-[selected-single=true]:bg-green-500"
-                              : dayEmotion && dayEmotion.emotion === "Love"
+                              : dayEmotion && dayEmotion.mood === "Excellent"
                                 ? "bg-purple-200 text-purple-600 data-[selected-single=true]:bg-purple-500"
                                 : "",
                     ),
@@ -124,13 +124,13 @@ export default function Dashboard({
                         <Wave
                           className={cn("absolute right-0 bottom-0 left-0")}
                           fill={
-                            defaultData.emotion === "Anger"
+                            defaultData.mood === "Awful"
                               ? "#ffa2a280"
-                              : defaultData.emotion === "Sadness"
+                              : defaultData.mood === "Bad"
                                 ? "#8ec5ff80"
-                                : defaultData.emotion === "Disgust"
+                                : defaultData.mood === "Normal"
                                   ? "#fff08580"
-                                  : defaultData.emotion === "Joy"
+                                  : defaultData.mood === "Good"
                                     ? "#7bf1a880"
                                     : "#dab2ff80"
                           }
@@ -149,11 +149,11 @@ export default function Dashboard({
 
                         <div className="z-10 flex flex-col items-center justify-center gap-2">
                           <span className="text-4xl">
-                            {Emotion[defaultData.emotion]}
+                            {Mood[defaultData.mood]}
                           </span>
                           <b
                             className={cn(
-                              `flex items-center text-lg ${defaultData.emotion === "Anger" ? "text-red-700/70" : defaultData.emotion === "Sadness" ? "text-blue-700/70" : defaultData.emotion === "Disgust" ? "text-yellow-700/70" : defaultData.emotion === "Joy" ? "text-green-700/70" : "text-purple-700/70"}`,
+                              `flex items-center text-lg ${defaultData.mood === "Awful" ? "text-red-700/70" : defaultData.mood === "Bad" ? "text-blue-700/70" : defaultData.mood === "Normal" ? "text-yellow-700/70" : defaultData.mood === "Good" ? "text-green-700/70" : "text-purple-700/70"}`,
                               "dark:brightness-200",
                             )}
                           >
@@ -162,9 +162,6 @@ export default function Dashboard({
                         </div>
                       </div>
                     )}
-                    {/* <Button variant="outline" className="w-full">
-              Add Entry
-            </Button> */}
                   </CardContent>
                 </Card>
               </EmotionDialog>

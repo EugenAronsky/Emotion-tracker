@@ -18,7 +18,10 @@ export async function DELETE(
     const docData = doc.data();
 
     if (!doc.exists) {
-      return NextResponse.json({ error: "Not found!" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Doesn't exist anymore!" },
+        { status: 404 },
+      );
     }
 
     if (docData?.to !== decoded.uid && docData?.from !== decoded.uid) {

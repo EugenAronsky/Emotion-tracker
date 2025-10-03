@@ -14,7 +14,7 @@ export async function GET(
     const decoded = await adminAuth.verifyIdToken(token);
 
     const collaborators = await adminDb
-      .collection("emotion-sets")
+      .collection("mood-set")
       .where("ownerId", "==", user_id)
       .get();
 

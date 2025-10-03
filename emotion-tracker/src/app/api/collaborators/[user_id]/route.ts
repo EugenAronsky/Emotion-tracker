@@ -4,7 +4,7 @@ import { SenderInfo } from "@/lib/type";
 
 async function deleteCollaborators(uid: string, user_id: string) {
   const collaborators = await adminDb
-    .collection("emotion-sets")
+    .collection("mood-set")
     .where("ownerId", "==", uid)
     .limit(1)
     .get();
@@ -32,7 +32,7 @@ export async function PUT(
     const decoded = await adminAuth.verifyIdToken(token);
 
     const collaborators = await adminDb
-      .collection("emotion-sets")
+      .collection("mood-set")
       .where("ownerId", "==", decoded.uid)
       .limit(1)
       .get();

@@ -83,7 +83,7 @@ export default function YearTab({
                 innerRadius={60}
                 outerRadius={80}
                 paddingAngle={5}
-                data={pieChartData.filter((emotion) => emotion.value > 0)}
+                data={pieChartData.filter((mood) => mood.value > 0)}
                 dataKey="value"
                 label={({ name, value, percent, x, y }) => (
                   <text
@@ -98,7 +98,7 @@ export default function YearTab({
                 )}
               >
                 {pieChartData
-                  .filter((emotion) => emotion.value > 0)
+                  .filter((mood) => mood.value > 0)
                   .map((entry) => (
                     <Cell
                       stroke="trnsperent"

@@ -39,7 +39,7 @@ export async function POST(req: Request) {
     const decoded = await adminAuth.verifyIdToken(token);
 
     const snap = await adminDb
-      .collection("emotion-sets")
+      .collection("mood-set")
       .where("ownerId", "==", decoded.uid)
       .limit(1)
       .get();
@@ -60,7 +60,7 @@ export async function POST(req: Request) {
       );
 
     const emotionSets = await adminDb
-      .collection("emotion-sets")
+      .collection("mood-set")
       .where("ownerEmail", "==", email)
       .get();
 

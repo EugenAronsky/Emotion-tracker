@@ -3,7 +3,6 @@ import NavWrapper from "@/components/blocks/nav-wrapper";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useEmotions } from "@/hooks/useEmotions";
 import { useFirebaseUser } from "@/hooks/useFirebaseUser";
-import { Emotion } from "@/lib/enums";
 import { EmotionReturnProps, Permission, SenderInfo } from "@/lib/type";
 import { VenetianMask } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
@@ -11,6 +10,7 @@ import { PuffLoader } from "react-spinners";
 import MonthTab from "./month-tab";
 import WeekTab from "./week-tab";
 import YearTab from "./year-tab";
+import { Mood } from "@/lib/enums";
 
 export type TabProps = {
   sortedPieChartData: {
@@ -67,7 +67,7 @@ export default function Statistics({
           }>,
           curr: EmotionReturnProps,
         ) => {
-          const obj = acc.find((item) => item.name === Emotion[curr.emotion]);
+          const obj = acc.find((item) => item.name === Mood[curr.mood]);
           obj && (obj.value = Number(obj.value) + Number(curr.intensity));
           return acc;
         },

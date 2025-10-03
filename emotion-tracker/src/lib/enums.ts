@@ -1,7 +1,7 @@
-export enum Emotion {
-  Anger = "😡",
-  Sadness = "😢",
-  Disgust = "🤨",
-  Joy = "😊",
-  Love = "😍",
+export enum Mood {
+  Awful = "😡",
+  Bad = "😢",
+  Normal = "🤨",
+  Good = "😊",
+  Excellent = "😍",
 }

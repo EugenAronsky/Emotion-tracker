@@ -38,7 +38,7 @@ export async function PUT(
       );
 
     const snap = await adminDb
-      .collection("emotion-sets")
+      .collection("mood-set")
       .where("ownerId", "==", decoded.uid)
       .limit(1)
       .get();

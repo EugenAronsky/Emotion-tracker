@@ -22,6 +22,69 @@ import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import { Slider } from "../ui/slider";
 import { Textarea } from "../ui/textarea";
 
+const emotions = {
+  Awful: [
+    "Awful",
+    "Rage",
+    "Fury",
+    "Aggression",
+    "Irritation",
+    "Annoyance",
+    "Outrage",
+    "Wrath",
+    "Hostility",
+    "Threat",
+  ],
+  Bad: [
+    "Bad",
+    "Grief",
+    "Melancholy",
+    "Sorrow",
+    "Despair",
+    "Hopelessness",
+    "Mourning",
+    "Pity",
+    "Disappointment",
+    "Suffering",
+  ],
+  Normal: [
+    "Confusion",
+    "Doubt",
+    "Suspicion",
+    "Dislike",
+    "Misunderstanding",
+    "Surprise",
+    "Alertness",
+    "Skepticism",
+    "Distrust",
+    "Hesitation",
+  ],
+  Good: [
+    "Good",
+    "Happiness",
+    "Pleasure",
+    "Delight",
+    "Gratitude",
+    "Lightness",
+    "Excitement",
+    "Kindness",
+    "Calmness",
+    "Smile",
+  ],
+  Excellent: [
+    "Excellent",
+    "Infatuation",
+    "Adoration",
+    "Charm",
+    "Tenderness",
+    "Affection",
+    "Admiration",
+    "Passion",
+    "Fondness",
+    "Devotion",
+  ],
+};
+
 export function EmotionDialog({
   defaultData,
   permission,
@@ -59,7 +122,8 @@ export function EmotionDialog({
       };
 
   const defaultValues = {
-    emotion: defaultData?.emotion || "Disgust",
+    mood: defaultData?.mood || "Normal",
+    emotion: defaultData?.emotion || emotions["Normal"]?.at(0) || "",
     description: defaultData?.description || "",
     intensity: defaultData?.intensity || 50,
   };
@@ -68,10 +132,12 @@ export function EmotionDialog({
     watch,
     reset,
     control,
+    setValue,
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<EmotionForm>();
+  const mood = watch("mood");
 
   useEffect(() => reset(defaultValues), [defaultData]);
 
@@ -94,9 +160,9 @@ export function EmotionDialog({
         );
   };
 
-  const close = () => {
+  const close = (open?: boolean) => {
     setTimeout(() => reset(defaultValues), 200);
-    setOpen(false);
+    setOpen(open || false);
   };
 
   return (
@@ -108,12 +174,14 @@ export function EmotionDialog({
           ? true
           : open
       }
-      onOpenChange={setOpen}
+      onOpenChange={close}
     >
       <DialogTrigger
         className={cn(
           Boolean(permission) && "pointer-events-none",
-          permission === "reader" && "pointer-events-auto",
+          permission === "reader" &&
+            Boolean(defaultData) &&
+            "pointer-events-auto",
         )}
         asChild
       >
@@ -137,75 +205,129 @@ export function EmotionDialog({
             <DialogTitle>New Entry</DialogTitle>
             <DialogDescription>How are you feeling today?</DialogDescription>
           </DialogHeader>
+
           <Controller
-            name="emotion"
+            name="mood"
             control={control}
             disabled={hidden}
-            defaultValue="Disgust"
+            defaultValue="Normal"
             render={({ field }) => (
               <RadioGroup
                 {...field}
-                onValueChange={field.onChange}
-                className="*:bg-secondary flex justify-between gap-3 *:flex *:size-14 *:items-center *:justify-center *:rounded-full *:max-[400px]:size-12 *:max-[400px]:text-3xl"
+                onValueChange={(value) => {
+                  field.onChange(value);
+
+                  if (
+                    defaultValues.mood === value &&
+                    Boolean(defaultValues.emotion)
+                  )
+                    setValue("emotion", defaultValues.emotion);
+                  else
+                    setValue(
+                      "emotion",
+                      emotions[value as keyof typeof emotions]?.at(0) || "",
+                    );
+                }}
+                className="*:bg-secondary flex justify-between gap-3 border-b pb-4 *:flex *:size-14 *:items-center *:justify-center *:rounded-full *:max-[400px]:size-12 *:max-[400px]:text-3xl"
               >
                 <Label
                   className={cn(
                     "text-4xl transition-all",
-                    field.value === "Anger" && "!bg-red-300",
+                    field.value === "Awful" && "!bg-red-300",
                   )}
                 >
                   <span>😡</span>
-                  <RadioGroupItem value="Anger" className="hidden" />
+                  <RadioGroupItem value="Awful" className="hidden" />
                 </Label>
 
                 <Label
                   className={cn(
                     "text-4xl transition-all",
-                    field.value === "Sadness" && "!bg-blue-300",
+                    field.value === "Bad" && "!bg-blue-300",
                   )}
                 >
                   <span>😢</span>
-                  <RadioGroupItem value="Sadness" className="hidden" />
+                  <RadioGroupItem value="Bad" className="hidden" />
                 </Label>
 
                 <Label
                   className={cn(
                     "text-4xl transition-all",
-                    field.value === "Disgust" && "!bg-yellow-300",
+                    field.value === "Normal" && "!bg-yellow-300",
                   )}
                 >
                   <span>🤨</span>
-                  <RadioGroupItem value="Disgust" className="hidden" />
+                  <RadioGroupItem value="Normal" className="hidden" />
                 </Label>
 
                 <Label
                   className={cn(
                     "text-4xl transition-all",
-                    field.value === "Joy" && "!bg-green-300",
+                    field.value === "Good" && "!bg-green-300",
                   )}
                 >
                   <span>😊</span>
-                  <RadioGroupItem value="Joy" className="hidden" />
+                  <RadioGroupItem value="Good" className="hidden" />
                 </Label>
 
                 <Label
                   className={cn(
                     "text-4xl transition-all",
-                    field.value === "Love" && "!bg-purple-300",
+                    field.value === "Excellent" && "!bg-purple-300",
                   )}
                 >
                   <span>😍</span>
-                  <RadioGroupItem value="Love" className="hidden" />
+                  <RadioGroupItem value="Excellent" className="hidden" />
                 </Label>
               </RadioGroup>
             )}
           />
+
+          <Controller
+            name="emotion"
+            control={control}
+            disabled={hidden}
+            render={({ field }) => (
+              <RadioGroup
+                {...field}
+                onValueChange={field.onChange}
+                className="*:bg-secondary flex flex-wrap gap-2 *:max-[400px]:text-sm"
+              >
+                {emotions[mood as keyof typeof emotions]?.map((emotion) => (
+                  <Label
+                    key={`sub-emotion-${emotion}`}
+                    className={cn(
+                      "flex items-center justify-center rounded-md border-2 px-1.5 py-1 text-sm opacity-85 transition-all dark:opacity-100",
+                      field.value === emotion
+                        ? mood === "Awful"
+                          ? "border-red-500 !bg-red-400/40 text-red-700 dark:border-red-300 dark:text-red-300"
+                          : mood === "Bad"
+                            ? "border-blue-500 !bg-blue-400/40 text-blue-700 dark:border-blue-300 dark:text-blue-300"
+                            : mood === "Normal"
+                              ? "border-yellow-500 !bg-yellow-400/40 text-yellow-700 dark:border-yellow-300 dark:text-yellow-300"
+                              : mood === "Good"
+                                ? "border-green-500 !bg-green-400/40 text-green-700 dark:border-green-300 dark:text-green-300"
+                                : mood === "Excellent"
+                                  ? "border-purple-500 !bg-purple-400/40 text-purple-700 dark:border-purple-300 dark:text-purple-300"
+                                  : null
+                        : null,
+                    )}
+                  >
+                    <span>{emotion}</span>
+                    <RadioGroupItem value={emotion} className="hidden" />
+                  </Label>
+                ))}
+              </RadioGroup>
+            )}
+          />
+
           <Textarea
             {...register("description")}
             className="h-36 resize-none disabled:opacity-100"
             placeholder="Add note..."
             disabled={hidden}
           />
+
           <Controller
             disabled={hidden}
             name="intensity"
@@ -223,19 +345,19 @@ export function EmotionDialog({
                   value={[field.value]}
                   className={cn(
                     "data-[disabled]:opacity-100",
-                    watch("emotion") === "Anger" &&
+                    mood === "Awful" &&
                       "*:first:*:bg-red-200 *:last:*:border-red-700 *:last:*:bg-red-400",
 
-                    watch("emotion") === "Sadness" &&
+                    mood === "Bad" &&
                       "*:first:*:bg-blue-200 *:last:*:border-blue-700 *:last:*:bg-blue-400",
 
-                    watch("emotion") === "Disgust" &&
+                    mood === "Normal" &&
                       "*:first:*:bg-yellow-200 *:last:*:border-yellow-600 *:last:*:bg-yellow-400",
 
-                    watch("emotion") === "Joy" &&
+                    mood === "Good" &&
                       "*:first:*:bg-green-200 *:last:*:border-green-700 *:last:*:bg-green-400",
 
-                    watch("emotion") === "Love" &&
+                    mood === "Excellent" &&
                       "*:first:*:bg-purple-200 *:last:*:border-purple-700 *:last:*:bg-purple-400",
                   )}
                   onValueChange={(val) => field.onChange(val[0])}

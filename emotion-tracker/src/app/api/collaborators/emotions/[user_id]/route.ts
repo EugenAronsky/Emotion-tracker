@@ -18,7 +18,7 @@ export async function GET(
     const decoded = await adminAuth.verifyIdToken(token);
 
     const emotionSets = await adminDb
-      .collection("emotion-sets")
+      .collection("mood-set")
       .where("ownerId", "==", user_id)
       .limit(1)
       .get();
@@ -51,6 +51,7 @@ export async function GET(
         case "observer":
           return {
             id: null,
+            mood: data.mood,
             emotion: data.emotion,
             date: data.date.toDate(),
           };

@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useCollaborators } from "@/hooks/useCollaborators";
 import { useEmotions } from "@/hooks/useEmotions";
-import { Emotion } from "@/lib/enums";
+import { Mood } from "@/lib/enums";
 import { EmotionForm, SenderInfo } from "@/lib/type";
 import { cn } from "@/lib/utils";
 import {
@@ -45,7 +45,7 @@ export default function CllaboratorCard({
     fromDate: fromDate,
   });
 
-  const emotion = emotionsByUserIdAndByRangeQuery.data?.at(0)?.emotion;
+  const mood = emotionsByUserIdAndByRangeQuery.data?.at(0)?.mood;
   const my_permission = collaboratorPermissionQuery.data?.permission;
 
   return (
@@ -97,17 +97,17 @@ export default function CllaboratorCard({
           <span
             className={cn(
               "bg-secondary flex size-10 items-center justify-center rounded-full p-1 text-2xl shadow-[0_2px_7px_-2px] shadow-black/50 dark:shadow-[0_2px_8px_-1px]",
-              emotion === "Anger" && "bg-red-300",
-              emotion === "Sadness" && "bg-blue-300",
-              emotion === "Disgust" && "bg-yellow-300",
-              emotion === "Joy" && "bg-green-300",
-              emotion === "Love" && "bg-purple-300",
+              mood === "Awful" && "bg-red-300",
+              mood === "Bad" && "bg-blue-300",
+              mood === "Normal" && "bg-yellow-300",
+              mood === "Good" && "bg-green-300",
+              mood === "Excellent" && "bg-purple-300",
             )}
           >
             {emotionsByUserIdAndByRangeQuery.isLoading ? (
               <LoaderCircle className="text-primary/50 animate-spin" />
             ) : emotionsByUserIdAndByRangeQuery.data?.length ? (
-              <>{Emotion[emotion as EmotionForm["emotion"]]}</>
+              <>{Mood[mood as EmotionForm["mood"]]}</>
             ) : (
               <Ghost className="text-primary/50" />
             )}

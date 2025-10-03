@@ -15,10 +15,10 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized!" }, { status: 401 });
     const decoded = await adminAuth.verifyIdToken(token);
 
-    const emotionSets = await adminDb.collection("emotion-sets").get();
+    const emotionSets = await adminDb.collection("mood-set").get();
 
     const collaborators = await adminDb
-      .collection("emotion-sets")
+      .collection("mood-set")
       .where("ownerId", "==", decoded.uid)
       .get();
 
@@ -61,13 +61,13 @@ export async function POST(req: Request) {
 
     if (from !== decoded.uid) {
       const ToEmotionSet = await adminDb
-        .collection("emotion-sets")
+        .collection("mood-set")
         .where("ownerId", "==", decoded.uid)
         .limit(1)
         .get();
 
       const FromEmotionSet = await adminDb
-        .collection("emotion-sets")
+        .collection("mood-set")
         .where("ownerId", "==", from)
         .limit(1)
         .get();

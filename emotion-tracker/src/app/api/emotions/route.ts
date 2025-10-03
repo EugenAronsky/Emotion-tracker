@@ -42,7 +42,8 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const { token, emotion, description, intensity, date } = await req.json();
+    const { token, mood, description, emotion, intensity, date } =
+      await req.json();
 
     // Проверяем токен пользователя
     const decoded = await adminAuth.verifyIdToken(token);
@@ -52,6 +53,7 @@ export async function POST(req: NextRequest) {
 
     await adminDb.collection("emotions").add({
       uid: decoded.uid,
+      mood,
       emotion,
       description,
       intensity,

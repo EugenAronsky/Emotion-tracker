@@ -15,12 +15,12 @@ export async function POST(req: Request) {
     const decoded = await adminAuth.verifyIdToken(token);
 
     const emotionSet = await adminDb
-      .collection("emotion-sets")
+      .collection("mood-set")
       .where("ownerId", "==", decoded.uid)
       .get();
 
     if (emotionSet.empty) {
-      await adminDb.collection("emotion-sets").add({
+      await adminDb.collection("mood-set").add({
         ownerEmail: decoded.email,
         ownerId: decoded.uid,
         sharedWith: [],

@@ -3,7 +3,6 @@ import Statistics from "@/app/statistics/ui/statistics";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
   DialogHeader,
@@ -12,9 +11,9 @@ import {
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Permission, SenderInfo } from "@/lib/type";
-import { ChartArea, Layout, Moon, Sun, User2, X } from "lucide-react";
+import { ChartArea, Layout, Moon, Sun, X } from "lucide-react";
 import { useTheme } from "next-themes";
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction } from "react";
 
 export default function CollaboratorInfo({
   senderInfo,

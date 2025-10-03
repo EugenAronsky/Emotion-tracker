@@ -1,10 +1,11 @@
 export type Permission = "observer" | "viewer" | "reader";
-export type Emotion = "Anger" | "Sadness" | "Disgust" | "Joy" | "Love";
+export type Mood = "Awful" | "Bad" | "Normal" | "Good" | "Excellent";
 
 export type EmotionForm = {
-  emotion: Emotion;
-  description: string;
+  mood: Mood;
+  emotion: string;
   intensity: number;
+  description: string;
 };
 
 export type EmotionReturnProps = EmotionForm & {
