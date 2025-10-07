@@ -1,7 +1,7 @@
 "use client";
-import NavWrapper from "@/components/blocks/nav-wrapper";
+import NavWrapper from "@/components/blocks/nav/nav-wrapper";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useEmotions } from "@/hooks/useEmotions";
+import { useEmotions } from "@/hooks/query/useEmotions";
 import { useFirebaseUser } from "@/hooks/useFirebaseUser";
 import { EmotionReturnProps, Permission, SenderInfo } from "@/lib/type";
 import { VenetianMask } from "lucide-react";
@@ -11,6 +11,7 @@ import MonthTab from "./month-tab";
 import WeekTab from "./week-tab";
 import YearTab from "./year-tab";
 import { Mood } from "@/lib/enums";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export type TabProps = {
   sortedPieChartData: {
@@ -30,6 +31,7 @@ export default function Statistics({
   senderInfo?: SenderInfo;
   permission?: Permission;
 }) {
+  const translate = useTranslation();
   const defaultFromDate = useMemo(() => {
     const date = new Date();
     const day = date.getDay();
@@ -120,10 +122,10 @@ export default function Statistics({
         onValueChange={tabsChangeHandler}
         className="flex w-full flex-col items-center justify-start gap-6 !shadow-none"
       >
-        <TabsList className="h-11 w-full gap-1 rounded-full *:rounded-full">
-          <TabsTrigger value="week">Week</TabsTrigger>
-          <TabsTrigger value="month">Month</TabsTrigger>
-          <TabsTrigger value="year">Year</TabsTrigger>
+        <TabsList className="h-11 w-full gap-1 rounded-full *:rounded-full rtl:flex-row-reverse">
+          <TabsTrigger value="week">{translate("week")}</TabsTrigger>
+          <TabsTrigger value="month">{translate("month")}</TabsTrigger>
+          <TabsTrigger value="year">{translate("year")}</TabsTrigger>
         </TabsList>
 
         {query.isLoading || loading ? (
@@ -154,7 +156,7 @@ export default function Statistics({
         ) : (
           <div className="flex grow flex-col items-center justify-center opacity-60">
             <VenetianMask size={120} className="stroke-1" />
-            There is no statistics for now
+            {translate("no_statistics")}
           </div>
         )}
       </Tabs>

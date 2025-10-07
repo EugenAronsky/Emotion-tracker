@@ -1,9 +1,11 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "@/hooks/useTranslation";
 import { auth, googleProvider } from "@/lib/firebase";
 import {
   browserLocalPersistence,
+  onAuthStateChanged,
   setPersistence,
   signInWithPopup,
 } from "firebase/auth";
@@ -14,20 +16,44 @@ import { BeatLoader } from "react-spinners";
 
 export default function GoogleSignInButton() {
   const router = useRouter();
-  const [redirect, setRedirect] = useState(false);
+  const translate = useTranslation();
+  const [loading, setLoading] = useState(false);
+
+  const redirect = () => {
+    if (document.referrer.includes(`${window.location.origin}/entrance/qrcode`))
+      router.back();
+    else router.replace("/dashboard");
+  };
 
   useEffect(() => {
+    // Сохраняем сессию между перезагрузками
     (async () => await setPersistence(auth, browserLocalPersistence))();
+
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        setLoading(true);
+        const token = await user.getIdToken();
+        await fetch("/api/set-token", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ token }),
+          credentials: "include",
+        });
+
+        redirect();
+      } else {
+        console.log("Any session...");
+      }
+    });
+
+    return () => unsubscribe();
   }, []);
 
   const handleGoogleSignIn = async () => {
     try {
-      setRedirect(true);
-
+      setLoading(true);
       // Открываем popup для Google login
       const result = await signInWithPopup(auth, googleProvider);
-
-      // Сохраняем сессию между перезагрузками
 
       // Получаем Firebase token
       const token = await result.user.getIdToken();
@@ -39,32 +65,28 @@ export default function GoogleSignInButton() {
         body: JSON.stringify({ token }),
         credentials: "include",
       });
-
       // Редирект на dashboard
-      if (
-        document.referrer.includes(`${window.location.origin}/entrance/qrcode`)
-      )
-        router.back();
-      else router.replace("/dashboard");
+      redirect();
     } catch (err: any) {
       console.error(err);
-      setRedirect(false);
-      alert(err.message ?? "Login failed");
-    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <main className="flex h-full w-full items-center justify-center">
       <section className="flex flex-col items-center gap-6">
-        {redirect ? (
+        {loading ? (
           <div className="flex items-center justify-center gap-2">
-            <b className="text-primary animate-pulse text-3xl">Redirecting</b>
+            <b className="text-primary animate-pulse text-3xl">
+              {translate("redirecting")}
+            </b>
             <BeatLoader size={10} className="mt-3 dark:invert" />
           </div>
         ) : (
           <>
-            <h1 className="text-2xl font-bold">Welcome to Emotion Tracker</h1>
+            <h1 className="text-2xl font-bold">{translate("welcome")}</h1>
+
             <Button
               onClick={handleGoogleSignIn}
               size={"lg"}
@@ -78,7 +100,7 @@ export default function GoogleSignInButton() {
                 height={20}
                 className="size-5 dark:invert"
               />
-              Continue with Google
+              {translate("googleSignIn")}
             </Button>
           </>
         )}

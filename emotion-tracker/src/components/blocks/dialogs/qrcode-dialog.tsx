@@ -9,7 +9,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useInvites } from "@/hooks/useInvite";
+import { useInvites } from "@/hooks/query/useInvite";
+import { useTranslation } from "@/hooks/useTranslation";
 import { Permission } from "@/lib/type";
 import { cn } from "@/lib/utils";
 import { CaptionsOff } from "lucide-react";
@@ -19,8 +20,8 @@ import React, { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { GridLoader } from "react-spinners";
 import { useDebounce } from "use-debounce";
-import { Label } from "../ui/label";
-import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
+import { Label } from "../../ui/label";
+import { RadioGroup, RadioGroupItem } from "../../ui/radio-group";
 
 const Loader = () => (
   <motion.div
@@ -44,6 +45,7 @@ const Loader = () => (
 
 function MyQRCodeDialog({ children }: { children: React.ReactNode }) {
   const mount = useRef(false);
+  const translate = useTranslation();
   const [permission, setPermission] = useState<Permission>("observer");
   const [debouncedPermission] = useDebounce(permission, 500);
   const { QRCodeInviteQuery } = useInvites({ permission: debouncedPermission });
@@ -70,7 +72,7 @@ function MyQRCodeDialog({ children }: { children: React.ReactNode }) {
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Let's scan it to add a friend</DialogTitle>
+          <DialogTitle>{translate("qrcode_dialog_title")}</DialogTitle>
           <DialogDescription hidden />
         </DialogHeader>
 
@@ -122,7 +124,7 @@ function MyQRCodeDialog({ children }: { children: React.ReactNode }) {
                   field.value === "observer" && "!bg-purple-500 text-white",
                 )}
               >
-                Observer
+                {translate("observer")}
                 <RadioGroupItem value="observer" className="hidden" />
               </Label>
 
@@ -132,7 +134,7 @@ function MyQRCodeDialog({ children }: { children: React.ReactNode }) {
                   field.value === "viewer" && "!bg-sky-400 text-white",
                 )}
               >
-                Viewer
+                {translate("viewer")}
                 <RadioGroupItem value="viewer" className="hidden" />
               </Label>
 
@@ -142,7 +144,7 @@ function MyQRCodeDialog({ children }: { children: React.ReactNode }) {
                   field.value === "reader" && "!bg-teal-400 text-white",
                 )}
               >
-                Reader
+                {translate("reader")}
                 <RadioGroupItem value="reader" className="hidden" />
               </Label>
             </RadioGroup>
@@ -151,7 +153,7 @@ function MyQRCodeDialog({ children }: { children: React.ReactNode }) {
         <DialogFooter>
           <DialogClose asChild>
             <Button variant="outline" type="button">
-              <CaptionsOff /> Close
+              <CaptionsOff /> {translate("close")}
             </Button>
           </DialogClose>
         </DialogFooter>

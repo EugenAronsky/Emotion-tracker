@@ -62,7 +62,7 @@ function Calendar({
           defaultClassNames.button_next,
         ),
         month_caption: cn(
-          "flex items-center justify-center h-(--cell-size) w-full px-(--cell-size)",
+          "flex items-center capitalize justify-center h-(--cell-size) w-full px-(--cell-size)",
           defaultClassNames.month_caption,
         ),
         dropdowns: cn(

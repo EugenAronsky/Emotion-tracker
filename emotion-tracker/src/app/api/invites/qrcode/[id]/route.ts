@@ -16,14 +16,13 @@ export async function PUT(
 
     const docRef = adminDb.collection("qr-codes").doc(id);
     const doc = await docRef.get();
+    const docData = doc?.data();
 
-    if (!doc.exists)
-      return NextResponse.json({ error: "Not found!" }, { status: 404 });
-
-    const docData = doc.data();
-
-    if (!docData)
-      return NextResponse.json({ error: "Not found!" }, { status: 404 });
+    if (!doc.exists || !docData)
+      return NextResponse.json(
+        { error: "QR code is unavailable!" },
+        { status: 410 },
+      );
 
     if (moment().isAfter(moment(new Date(docData.expiryDate))))
       return NextResponse.json(

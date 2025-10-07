@@ -9,6 +9,7 @@ import { useRef } from "react";
 import Wave from "react-wavify";
 import { Cell, Pie, PieChart } from "recharts";
 import { TabProps } from "../page";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export default function WeekTab({
   sortedPieChartData,
@@ -16,6 +17,7 @@ export default function WeekTab({
   permission,
   id,
 }: TabProps & { id?: string }) {
+  const translate = useTranslation();
   const maxIntensity = useRef<number>(0);
 
   return (
@@ -28,7 +30,7 @@ export default function WeekTab({
         <Button
           onClick={async () => id && (await shareScreenshot(id))}
           className={cn(
-            "absolute top-5 right-1 z-20",
+            "absolute top-5 z-20 ltr:right-1 rtl:left-1",
             Boolean(permission) && "hidden",
           )}
           variant={"ghost"}
@@ -58,7 +60,9 @@ export default function WeekTab({
           }}
         />
         <CardContent className="z-10 flex h-fit flex-col justify-center">
-          <b className="mb-1 w-full text-center text-lg">Weekly Mood</b>
+          <b className="mb-1 w-full text-center text-lg">
+            {translate("weekly_mood")}
+          </b>
           <section className="relative flex w-full flex-col items-center gap-2">
             <span
               className={cn(
@@ -76,7 +80,11 @@ export default function WeekTab({
             >
               {sortedPieChartData.at(0)?.name}
             </span>
-            <PieChart width={300} height={160} className="pointer-events-none">
+            <PieChart
+              width={300}
+              height={160}
+              className="pointer-events-none rtl:rotate-y-180"
+            >
               <Pie
                 cy={110}
                 endAngle={-20}

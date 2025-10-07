@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useFirebaseUser } from "./useFirebaseUser";
+import { useFirebaseUser } from "../useFirebaseUser";
 import { getAiTip } from "@/lib/controllers/gemini-controller";
 
 export function useGemini(options?: {

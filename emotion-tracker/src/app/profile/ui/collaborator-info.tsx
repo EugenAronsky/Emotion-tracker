@@ -1,5 +1,6 @@
 import Dashboard from "@/app/dashboard/ui/dashboard";
 import Statistics from "@/app/statistics/ui/statistics";
+import LanguagePicker from "@/components/blocks/nav/language-picker";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -11,7 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Permission, SenderInfo } from "@/lib/type";
-import { ChartArea, Layout, Moon, Sun, X } from "lucide-react";
+import { ChartArea, Languages, Layout, Moon, Sun, X } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Dispatch, SetStateAction } from "react";
 
@@ -49,6 +50,12 @@ export default function CollaboratorInfo({
               {theme === "light" ? <Sun /> : <Moon />}
             </Button>
 
+            <LanguagePicker>
+              <Button size={"icon"} variant={"outline"}>
+                <Languages />
+              </Button>
+            </LanguagePicker>
+
             <Button
               onClick={() => setDefaultOpen(false)}
               variant={"destructive"}
@@ -70,7 +77,7 @@ export default function CollaboratorInfo({
 
           <TabsList
             defaultValue={"dashboard"}
-            className="flex h-fit w-full items-center justify-around gap-4 border-t bg-transparent px-6 py-4 *:h-9 *:grow"
+            className="flex h-fit w-full items-center justify-around gap-4 border-t bg-transparent px-6 py-4 *:h-9 *:grow rtl:flex-row-reverse"
           >
             <TabsTrigger value="dashboard" asChild>
               <Button variant={"secondary"}>

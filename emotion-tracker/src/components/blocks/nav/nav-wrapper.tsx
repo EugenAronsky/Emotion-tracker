@@ -1,15 +1,15 @@
 "use client";
 
+import { useInvites } from "@/hooks/query/useInvite";
 import { useFirebaseUser } from "@/hooks/useFirebaseUser";
-import { useInvites } from "@/hooks/useInvite";
-import { InviteProps } from "@/lib/type";
-import { ChartArea, Layout, Moon, Sun, User2 } from "lucide-react";
+import { ChartArea, Languages, Layout, Moon, Sun, User2 } from "lucide-react";
 import { useTheme } from "next-themes";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Button } from "../ui/button";
-import { InviteDialog } from "./invite-dialog";
+import { Button } from "../../ui/button";
+import { InviteDialog } from "../dialogs/invite-dialog";
+import LanguagePicker from "./language-picker";
 
 export default function NavWrapper({
   hidden,
@@ -42,8 +42,6 @@ export default function NavWrapper({
         number: index,
       })),
     );
-
-    console.log(invitesQuery.data);
   }, [invitesQuery.data]);
 
   return (
@@ -53,15 +51,24 @@ export default function NavWrapper({
         hidden={hidden}
       >
         <h1 className="text-xl font-bold">Mood Diary</h1>
-        <Button
-          variant={"outline"}
-          size={"icon"}
-          onClick={() =>
-            theme === "light" ? setTheme("dark") : setTheme("light")
-          }
-        >
-          {mounted && theme === "light" ? <Sun /> : <Moon />}
-        </Button>
+
+        <section className="flex items-center justify-center gap-3">
+          <Button
+            size={"icon"}
+            variant={"outline"}
+            onClick={() =>
+              theme === "light" ? setTheme("dark") : setTheme("light")
+            }
+          >
+            {mounted && theme === "light" ? <Sun /> : <Moon />}
+          </Button>
+
+          <LanguagePicker>
+            <Button size={"icon"} variant={"outline"}>
+              <Languages />
+            </Button>
+          </LanguagePicker>
+        </section>
       </header>
       <section className="flex grow px-6 pb-6">{children}</section>
       <footer

@@ -1,9 +1,9 @@
 "use client";
-import { EmotionDialog } from "@/components/blocks/emotion-dialog";
-import NavWrapper from "@/components/blocks/nav-wrapper";
+import { EmotionDialog } from "@/components/blocks/dialogs/emotion-dialog";
+import NavWrapper from "@/components/blocks/nav/nav-wrapper";
 import { Calendar, CalendarDayButton } from "@/components/ui/calendar";
 import { Card, CardContent } from "@/components/ui/card";
-import { useEmotions } from "@/hooks/useEmotions";
+import { useEmotions } from "@/hooks/query/useEmotions";
 import { useFirebaseUser } from "@/hooks/useFirebaseUser";
 import { Mood } from "@/lib/enums";
 import { EmotionReturnProps, Permission, SenderInfo } from "@/lib/type";
@@ -12,6 +12,9 @@ import moment from "moment";
 import React, { useEffect } from "react";
 import { PuffLoader } from "react-spinners";
 import Wave from "react-wavify";
+import { ru, enUS, he } from "react-day-picker/locale";
+import { useStore } from "@/app/store";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export default function Dashboard({
   senderInfo,
@@ -20,10 +23,13 @@ export default function Dashboard({
   senderInfo?: SenderInfo;
   permission?: Permission;
 }) {
+  const { lang } = useStore();
   const { emotionsQuery, emotionsByUserIdQuery } = useEmotions({
     user_id: senderInfo?.uid,
   });
+  const translate = useTranslation();
   const { loading } = useFirebaseUser();
+  const emotions = translate("emotions");
   const [date, setDate] = React.useState<Date | undefined>(new Date());
   const [defaultData, setDefaultData] = React.useState<
     EmotionReturnProps | undefined
@@ -55,6 +61,7 @@ export default function Dashboard({
         ) : (
           <>
             <Calendar
+              locale={lang === "ru" ? ru : lang === "he" ? he : enUS}
               defaultMonth={new Date(date || new Date())}
               fixedWeeks
               mode="single"
@@ -112,10 +119,9 @@ export default function Dashboard({
                     {defaultData === undefined ? (
                       <>
                         <span className="flex flex-col items-center justify-center gap-2 text-center">
-                          <b className="">No entries yet</b>
-                          <p className="text-xs">
-                            Start trecking your emotions to see your <br />
-                            progress.
+                          <b className="">{translate("no_entries")}</b>
+                          <p className="text-xs whitespace-pre">
+                            {translate("start_trecking")}
                           </p>
                         </span>
                       </>
@@ -149,7 +155,7 @@ export default function Dashboard({
 
                         <div className="z-10 flex flex-col items-center justify-center gap-2">
                           <span className="text-4xl">
-                            {Mood[defaultData.mood]}
+                            {defaultData.emotion}
                           </span>
                           <b
                             className={cn(
@@ -157,7 +163,8 @@ export default function Dashboard({
                               "dark:brightness-200",
                             )}
                           >
-                            {defaultData.emotion} - {defaultData.intensity}
+                            {emotions[defaultData.mood][defaultData.emotion]} -{" "}
+                            {defaultData.intensity}
                           </b>
                         </div>
                       </div>

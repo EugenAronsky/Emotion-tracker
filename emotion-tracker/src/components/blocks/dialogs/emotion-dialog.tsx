@@ -9,7 +9,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useEmotions } from "@/hooks/useEmotions";
+import { useEmotions } from "@/hooks/query/useEmotions";
 import { EmotionForm, EmotionReturnProps, Permission } from "@/lib/type";
 import { cn } from "@/lib/utils";
 import { UseMutationResult } from "@tanstack/react-query";
@@ -17,73 +17,11 @@ import { Eraser, HardDriveUpload, Trash2, UploadCloud } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { PuffLoader } from "react-spinners";
-import { Label } from "../ui/label";
-import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
-import { Slider } from "../ui/slider";
-import { Textarea } from "../ui/textarea";
-
-const emotions = {
-  Awful: [
-    "Awful",
-    "Rage",
-    "Fury",
-    "Aggression",
-    "Irritation",
-    "Annoyance",
-    "Outrage",
-    "Wrath",
-    "Hostility",
-    "Threat",
-  ],
-  Bad: [
-    "Bad",
-    "Grief",
-    "Melancholy",
-    "Sorrow",
-    "Despair",
-    "Hopelessness",
-    "Mourning",
-    "Pity",
-    "Disappointment",
-    "Suffering",
-  ],
-  Normal: [
-    "Confusion",
-    "Doubt",
-    "Suspicion",
-    "Dislike",
-    "Misunderstanding",
-    "Surprise",
-    "Alertness",
-    "Skepticism",
-    "Distrust",
-    "Hesitation",
-  ],
-  Good: [
-    "Good",
-    "Happiness",
-    "Pleasure",
-    "Delight",
-    "Gratitude",
-    "Lightness",
-    "Excitement",
-    "Kindness",
-    "Calmness",
-    "Smile",
-  ],
-  Excellent: [
-    "Excellent",
-    "Infatuation",
-    "Adoration",
-    "Charm",
-    "Tenderness",
-    "Affection",
-    "Admiration",
-    "Passion",
-    "Fondness",
-    "Devotion",
-  ],
-};
+import { Label } from "../../ui/label";
+import { RadioGroup, RadioGroupItem } from "../../ui/radio-group";
+import { Slider } from "../../ui/slider";
+import { Textarea } from "../../ui/textarea";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export function EmotionDialog({
   defaultData,
@@ -96,7 +34,9 @@ export function EmotionDialog({
   children: React.ReactNode;
   defaultData: EmotionReturnProps | undefined;
 }) {
+  const translate = useTranslation();
   const hidden = Boolean(permission);
+  const emotions = translate("emotions");
   const [open, setOpen] = useState(false);
   const { updateMutation, createMutation, deleteMutation } = !hidden
     ? useEmotions()
@@ -123,7 +63,8 @@ export function EmotionDialog({
 
   const defaultValues = {
     mood: defaultData?.mood || "Normal",
-    emotion: defaultData?.emotion || emotions["Normal"]?.at(0) || "",
+    emotion:
+      defaultData?.emotion || Object.keys(emotions["Normal"])?.at(0) || "",
     description: defaultData?.description || "",
     intensity: defaultData?.intensity || 50,
   };
@@ -187,7 +128,7 @@ export function EmotionDialog({
       >
         {children}
       </DialogTrigger>
-      <DialogContent className="overflow-hidden sm:max-w-[425px]">
+      <DialogContent className="overflow-hidden max-[400px]:p-4 sm:max-w-[425px]">
         <div
           className={cn(
             "absolute top-0 left-0 z-50 flex h-full w-full items-center justify-center transition-all",
@@ -201,9 +142,11 @@ export function EmotionDialog({
           <PuffLoader size={140} color="#3b82f6" />
         </div>
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-          <DialogHeader className="mb-6">
-            <DialogTitle>New Entry</DialogTitle>
-            <DialogDescription>How are you feeling today?</DialogDescription>
+          <DialogHeader>
+            <DialogTitle>{translate("emotion_dialog_title")}</DialogTitle>
+            <DialogDescription>
+              {translate("emotion_dialog_description")}
+            </DialogDescription>
           </DialogHeader>
 
           <Controller
@@ -225,7 +168,9 @@ export function EmotionDialog({
                   else
                     setValue(
                       "emotion",
-                      emotions[value as keyof typeof emotions]?.at(0) || "",
+                      Object.keys(emotions[value as keyof typeof emotions])?.at(
+                        0,
+                      ) || "",
                     );
                 }}
                 className="*:bg-secondary flex justify-between gap-3 border-b pb-4 *:flex *:size-14 *:items-center *:justify-center *:rounded-full *:max-[400px]:size-12 *:max-[400px]:text-3xl max-[361px]:gap-2"
@@ -291,40 +236,49 @@ export function EmotionDialog({
               <RadioGroup
                 {...field}
                 onValueChange={field.onChange}
-                className="*:bg-secondary flex flex-wrap justify-center gap-2 *:max-[400px]:text-sm"
+                className="*:bg-secondary flex flex-wrap justify-center gap-2"
               >
-                {emotions[mood as keyof typeof emotions]?.map((emotion) => (
-                  <Label
-                    key={`sub-emotion-${emotion}`}
-                    className={cn(
-                      "flex items-center justify-center rounded-md border-2 px-1.5 py-1 text-sm opacity-85 transition-all dark:opacity-100",
-                      field.value === emotion
-                        ? mood === "Awful"
-                          ? "border-red-500 !bg-red-400/40 text-red-700 dark:border-red-300 dark:text-red-300"
-                          : mood === "Bad"
-                            ? "border-blue-500 !bg-blue-400/40 text-blue-700 dark:border-blue-300 dark:text-blue-300"
-                            : mood === "Normal"
-                              ? "border-yellow-500 !bg-yellow-400/40 text-yellow-700 dark:border-yellow-300 dark:text-yellow-300"
-                              : mood === "Good"
-                                ? "border-green-500 !bg-green-400/40 text-green-700 dark:border-green-300 dark:text-green-300"
-                                : mood === "Excellent"
-                                  ? "border-purple-500 !bg-purple-400/40 text-purple-700 dark:border-purple-300 dark:text-purple-300"
-                                  : null
-                        : null,
-                    )}
-                  >
-                    <span>{emotion}</span>
-                    <RadioGroupItem value={emotion} className="hidden" />
-                  </Label>
-                ))}
+                {Object.keys(emotions[mood as keyof typeof emotions])?.map(
+                  (emotion) => {
+                    const moodObj = emotions[mood as keyof typeof emotions];
+
+                    return (
+                      <Label
+                        key={`sub-emotion-${emotion}`}
+                        className={cn(
+                          "flex items-center justify-center rounded-md border px-1.5 py-1 text-sm opacity-85 transition-all dark:opacity-100",
+                          field.value === emotion
+                            ? mood === "Awful"
+                              ? "border-red-500 !bg-red-400/40 text-red-700 dark:border-red-300 dark:text-red-300"
+                              : mood === "Bad"
+                                ? "border-blue-500 !bg-blue-400/40 text-blue-700 dark:border-blue-300 dark:text-blue-300"
+                                : mood === "Normal"
+                                  ? "border-yellow-500 !bg-yellow-400/40 text-yellow-700 dark:border-yellow-300 dark:text-yellow-300"
+                                  : mood === "Good"
+                                    ? "border-green-500 !bg-green-400/40 text-green-700 dark:border-green-300 dark:text-green-300"
+                                    : mood === "Excellent"
+                                      ? "border-purple-500 !bg-purple-400/40 text-purple-700 dark:border-purple-300 dark:text-purple-300"
+                                      : null
+                            : null,
+                        )}
+                      >
+                        <span>{`${emotion} ${moodObj[emotion as keyof typeof moodObj]}`}</span>
+                        <RadioGroupItem value={emotion} className="hidden" />
+                      </Label>
+                    );
+                  },
+                )}
               </RadioGroup>
             )}
           />
 
           <Textarea
             {...register("description")}
-            className="h-36 resize-none disabled:opacity-100"
-            placeholder="Add note..."
+            className={cn(
+              "h-36 resize-none disabled:opacity-100",
+              !Boolean(defaultData?.description) && hidden && "hidden",
+            )}
+            placeholder={translate("emotion_dialog_textarea_placeholder")}
             disabled={hidden}
           />
 
@@ -336,7 +290,7 @@ export function EmotionDialog({
             render={({ field }) => (
               <div className="flex flex-col gap-2">
                 <div className="flex items-center justify-between text-sm">
-                  <span>Intensity</span>
+                  <span>{translate("intensity")}</span>
                   <span>{field.value}</span>
                 </div>
 
@@ -367,7 +321,7 @@ export function EmotionDialog({
               </div>
             )}
           />
-          <DialogFooter className="mt-6 flex flex-row *:grow" hidden={hidden}>
+          <DialogFooter className="flex flex-row *:grow" hidden={hidden}>
             {defaultData && (
               <Button
                 onClick={() => deleteMutation.mutate(defaultData.id)}
@@ -385,7 +339,7 @@ export function EmotionDialog({
                 variant="outline"
                 type="button"
               >
-                <Eraser /> Cancel
+                <Eraser /> {translate("cancel")}
               </Button>
             </DialogClose>
 
@@ -393,12 +347,12 @@ export function EmotionDialog({
               {!defaultData ? (
                 <>
                   <UploadCloud />
-                  Upload
+                  {translate("upload")}
                 </>
               ) : (
                 <>
                   <HardDriveUpload />
-                  Update
+                  {translate("update")}
                 </>
               )}
             </Button>

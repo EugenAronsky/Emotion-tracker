@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useFirebaseUser } from "./useFirebaseUser";
+import { useFirebaseUser } from "../useFirebaseUser";
 import {
   addCollaborator,
   getCollaborators,
@@ -9,10 +9,13 @@ import {
 } from "@/lib/controllers/collaborators-controller";
 import { toast } from "sonner";
 import { errorToast } from "@/lib/func";
+import { useTranslation } from "../useTranslation";
 
 export function useCollaborators(options?: { user_id?: string | undefined }) {
-  const queryClient = useQueryClient();
+  const translate = useTranslation();
   const { user } = useFirebaseUser();
+  const queryClient = useQueryClient();
+  const messages = translate("collaborators_mutation_messages");
 
   const collaboratorsQuery = useQuery({
     queryKey: ["collaborators"],
@@ -42,7 +45,7 @@ export function useCollaborators(options?: { user_id?: string | undefined }) {
     mutationFn: removeCollaborator,
     onSuccess: () => {
       queryClient.refetchQueries({ queryKey: ["collaborators"] }); // рефетч
-      toast.success("Unsubscribed successfully", {
+      toast.success(messages.remove, {
         className: "!bg-green-500/50 !border-green-600 !backdrop-blur-sm",
         duration: 3000,
       });
@@ -54,7 +57,7 @@ export function useCollaborators(options?: { user_id?: string | undefined }) {
     mutationFn: updateCollaborator,
     onSuccess: () => {
       queryClient.refetchQueries({ queryKey: ["collaborators"] }); // рефетч
-      toast.success("Collaborator has been updated", {
+      toast.success(messages.update, {
         className: "!bg-green-500/50 !border-green-600 !backdrop-blur-sm",
         duration: 3000,
       });

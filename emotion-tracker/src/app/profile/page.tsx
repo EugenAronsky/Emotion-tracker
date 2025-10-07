@@ -1,9 +1,9 @@
 "use client";
-import { CollaboratorDialog } from "@/components/blocks/collaborator-dialog";
-import NavWrapper from "@/components/blocks/nav-wrapper";
+import { CollaboratorDialog } from "@/components/blocks/dialogs/collaborator-dialog";
+import NavWrapper from "@/components/blocks/nav/nav-wrapper";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { useCollaborators } from "@/hooks/useCollaborators";
+import { useCollaborators } from "@/hooks/query/useCollaborators";
 import { useFirebaseUser } from "@/hooks/useFirebaseUser";
 import { auth } from "@/lib/firebase";
 import { SenderInfo } from "@/lib/type";
@@ -19,10 +19,12 @@ import {
 import moment from "moment";
 import Image from "next/image";
 import { PuffLoader } from "react-spinners";
-import MyQRCodeDialog from "../../components/blocks/qrcode-dialog";
+import MyQRCodeDialog from "../../components/blocks/dialogs/qrcode-dialog";
 import CllaboratorCard from "./ui/collaborator-card";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export default function Profile() {
+  const translate = useTranslation();
   const { user, loading } = useFirebaseUser();
   const { collaboratorsQuery } = useCollaborators();
 
@@ -41,10 +43,12 @@ export default function Profile() {
                     src={user.photoURL}
                     className="border-secondary rounded-full border-[3.5px]"
                   />
-                  <div className="flex flex-col gap-0.5">
-                    <b className="text-xl">{user?.displayName}</b>
-                    <span className="text-sm">
-                      {`Joined since ${moment(user?.metadata.creationTime).format("DD/MM/YYYY")}`}
+                  <div className="flex flex-col gap-0.5 max-[400px]:max-w-[130px]">
+                    <b className="truncate text-xl max-[400px]:text-lg">
+                      {user?.displayName}
+                    </b>
+                    <span className="text-sm max-[400px]:text-xs">
+                      {`${translate("joined_since")} ${moment(user?.metadata.creationTime).format("DD/MM/YYYY")}`}
                     </span>
                   </div>
                 </div>
@@ -64,7 +68,7 @@ export default function Profile() {
               <CardHeader className="text-md flex items-center justify-between">
                 <div className="text-md flex items-center gap-3">
                   <Waypoints size={20} />
-                  <b>Collaborators</b>
+                  <b>{translate("collaborators")}</b>
                 </div>
 
                 <div className="flex gap-3">
@@ -106,7 +110,7 @@ export default function Profile() {
                     ) : (
                       <div className="flex grow flex-col items-center justify-center opacity-60">
                         <HatGlasses size={80} className="stroke-1" />
-                        <span>No collaborators</span>
+                        <span>{translate("no_collaborators")}</span>
                       </div>
                     )
                   ) : (

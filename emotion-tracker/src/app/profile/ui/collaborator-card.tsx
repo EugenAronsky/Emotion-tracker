@@ -1,3 +1,4 @@
+import { CollaboratorDialog } from "@/components/blocks/dialogs/collaborator-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -6,8 +7,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useCollaborators } from "@/hooks/useCollaborators";
-import { useEmotions } from "@/hooks/useEmotions";
+import { useCollaborators } from "@/hooks/query/useCollaborators";
+import { useEmotions } from "@/hooks/query/useEmotions";
+import { useTranslation } from "@/hooks/useTranslation";
 import { Mood } from "@/lib/enums";
 import { EmotionForm, SenderInfo } from "@/lib/type";
 import { cn } from "@/lib/utils";
@@ -21,7 +23,7 @@ import {
 import { useMemo, useState } from "react";
 import { PuffLoader } from "react-spinners";
 import CollaboratorInfo from "./collaborator-info";
-import { CollaboratorDialog } from "@/components/blocks/collaborator-dialog";
+import { useStore } from "@/app/store";
 
 export default function CllaboratorCard({
   emails,
@@ -30,6 +32,8 @@ export default function CllaboratorCard({
   senderInfo: SenderInfo;
   emails: Array<string>;
 }) {
+  const { lang } = useStore();
+  const translate = useTranslation();
   const [open, setOpen] = useState(false);
 
   const fromDate = useMemo(() => {
@@ -112,7 +116,9 @@ export default function CllaboratorCard({
               <Ghost className="text-primary/50" />
             )}
           </span>
-          <span className="font-[500] opacity-90">{senderInfo.name}</span>
+          <span className="truncate font-[500] opacity-90 max-[400px]:max-w-[130px] max-[400px]:text-sm">
+            {senderInfo.name}
+          </span>
         </div>
         <DropdownMenu modal={false}>
           <DropdownMenuTrigger asChild>
@@ -120,7 +126,10 @@ export default function CllaboratorCard({
               <EllipsisVertical />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-fit min-w-0 *:gap-3" align="end">
+          <DropdownMenuContent
+            className="w-fit min-w-0 *:gap-3"
+            align={lang === "he" ? "start" : "end"}
+          >
             <DropdownMenuItem asChild>
               <CollaboratorDialog
                 defaultData={{
@@ -133,7 +142,7 @@ export default function CllaboratorCard({
               >
                 <div className="flex h-8 w-full gap-3 px-2 py-1.5">
                   <UserRoundPen size={16} />
-                  <span className="text-sm">Edit</span>
+                  <span className="text-sm">{translate("edit")}</span>
                 </div>
               </CollaboratorDialog>
             </DropdownMenuItem>
@@ -143,7 +152,7 @@ export default function CllaboratorCard({
               }}
             >
               <UserRoundX className="text-destructive" />
-              <span className="text-destructive">Remove</span>
+              <span className="text-destructive">{translate("remove")}</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

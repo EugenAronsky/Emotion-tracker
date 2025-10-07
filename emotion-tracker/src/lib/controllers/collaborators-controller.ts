@@ -1,4 +1,4 @@
-import { CollaboratorInviteProps } from "@/components/blocks/collaborator-dialog";
+import { CollaboratorInviteProps } from "@/components/blocks/dialogs/collaborator-dialog";
 import { auth } from "@/lib/firebase";
 import { errorHandler } from "../func";
 

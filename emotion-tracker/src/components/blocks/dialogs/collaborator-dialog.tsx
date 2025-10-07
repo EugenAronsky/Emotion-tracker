@@ -9,8 +9,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useCollaborators } from "@/hooks/useCollaborators";
-import { useInvites } from "@/hooks/useInvite";
+import { useCollaborators } from "@/hooks/query/useCollaborators";
+import { useInvites } from "@/hooks/query/useInvite";
 import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -32,10 +32,11 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "../ui/command";
-import { Label } from "../ui/label";
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
+} from "../../ui/command";
+import { Label } from "../../ui/label";
+import { Popover, PopoverContent, PopoverTrigger } from "../../ui/popover";
+import { RadioGroup, RadioGroupItem } from "../../ui/radio-group";
+import { useTranslation } from "@/hooks/useTranslation";
 
 const CollaboratorInviteSchema = z
   .object({
@@ -57,6 +58,7 @@ export function CollaboratorDialog({
     | (CollaboratorInviteProps & { uid: string; name: string })
     | undefined;
 }) {
+  const translate = useTranslation();
   const [open, setOpen] = useState(false);
   const { inviteCollaboratorMutation } = useInvites();
   const { updateCollaboratorMutation, removeCollaboratorMutation } =
@@ -131,10 +133,12 @@ export function CollaboratorDialog({
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
           <DialogHeader className="mb-3">
             <DialogTitle>
-              {defaultData?.name ? defaultData.name : "Invite friend"}
+              {defaultData?.name
+                ? defaultData.name
+                : translate("collaborator_dialog_title")}
             </DialogTitle>
             <DialogDescription hidden={Boolean(defaultData)}>
-              Share emotion with friends!
+              {translate("collaborator_dialog_description")}
             </DialogDescription>
           </DialogHeader>
 
@@ -158,18 +162,18 @@ export function CollaboratorDialog({
                       ? defaultData?.email
                       : value
                         ? emails.find((email) => email === value)
-                        : "Select email..."}
+                        : translate("email_popover_placeholder")}
                     <ChevronsUpDown className="opacity-50" />
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-[var(--radix-popper-anchor-width)] p-0">
                   <Command>
                     <CommandInput
-                      placeholder="Search email..."
+                      placeholder={translate("email_popover_placeholder")}
                       className="h-9"
                     />
                     <CommandList>
-                      <CommandEmpty>No framework found.</CommandEmpty>
+                      <CommandEmpty>{translate("no_user")}</CommandEmpty>
                       <CommandGroup>
                         {emails.map((email) => (
                           <CommandItem
@@ -213,7 +217,7 @@ export function CollaboratorDialog({
               <RadioGroup
                 {...field}
                 onValueChange={field.onChange}
-                className="*:border-input flex gap-3 *:flex *:h-9 *:w-full *:items-center *:justify-center *:rounded-md *:border *:px-3 *:py-1.5 *:text-sm"
+                className="*:border-input flex gap-3 *:flex *:h-9 *:w-full *:items-center *:justify-center *:rounded-md *:border *:px-3 *:py-1.5 *:text-sm rtl:flex-row-reverse"
               >
                 <Label
                   className={cn(
@@ -221,7 +225,7 @@ export function CollaboratorDialog({
                     field.value === "observer" && "!bg-purple-500 text-white",
                   )}
                 >
-                  Observer
+                  {translate("observer")}
                   <RadioGroupItem value="observer" className="hidden" />
                 </Label>
 
@@ -231,7 +235,7 @@ export function CollaboratorDialog({
                     field.value === "viewer" && "!bg-sky-400 text-white",
                   )}
                 >
-                  Viewer
+                  {translate("viewer")}
                   <RadioGroupItem value="viewer" className="hidden" />
                 </Label>
 
@@ -241,7 +245,7 @@ export function CollaboratorDialog({
                     field.value === "reader" && "!bg-teal-400 text-white",
                   )}
                 >
-                  Reader
+                  {translate("reader")}
                   <RadioGroupItem value="reader" className="hidden" />
                 </Label>
               </RadioGroup>
@@ -269,7 +273,8 @@ export function CollaboratorDialog({
                 variant="outline"
                 type="button"
               >
-                <TicketX /> Cancel
+                <TicketX />
+                {translate("cancel")}
               </Button>
             </DialogClose>
 
@@ -277,12 +282,12 @@ export function CollaboratorDialog({
               {!defaultData ? (
                 <>
                   <Send />
-                  Invite
+                  {translate("invite")}
                 </>
               ) : (
                 <>
                   <HardDriveUpload />
-                  Update
+                  {translate("update")}
                 </>
               )}
             </Button>

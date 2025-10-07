@@ -9,7 +9,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useInvites } from "@/hooks/useInvite";
+import { useInvites } from "@/hooks/query/useInvite";
+import { useTranslation } from "@/hooks/useTranslation";
 import { InviteProps } from "@/lib/type";
 import { cn } from "@/lib/utils";
 import { PartyPopper, TicketX } from "lucide-react";
@@ -23,6 +24,7 @@ export function InviteDialog({
   data: InviteProps;
   onInteractionEnd?: () => void;
 }) {
+  const translate = useTranslation();
   const [open, setOpen] = useState(true);
   const { inviteConfirmationMutation, denyInviteMutation } = useInvites();
 
@@ -56,7 +58,7 @@ export function InviteDialog({
         <DialogHeader>
           <DialogTitle>{data.senderInfo.name}</DialogTitle>
           <DialogDescription>
-            Invite you to share yours emotions!
+            {translate("invite_dialog_description")}
           </DialogDescription>
           <div
             className={cn(
@@ -79,7 +81,8 @@ export function InviteDialog({
               variant="destructive"
               type="button"
             >
-              <TicketX /> Deny
+              <TicketX />
+              {translate("deny")}
             </Button>
           </DialogClose>
 
@@ -91,7 +94,7 @@ export function InviteDialog({
             }
           >
             <PartyPopper />
-            Confirm
+            {translate("confirm")}
           </Button>
         </DialogFooter>
       </DialogContent>

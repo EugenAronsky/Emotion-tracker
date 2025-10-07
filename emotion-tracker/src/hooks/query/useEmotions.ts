@@ -8,16 +8,20 @@ import {
   updateEmotion,
 } from "@/lib/controllers/emotions-controller";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useFirebaseUser } from "./useFirebaseUser";
+import { useFirebaseUser } from "../useFirebaseUser";
 import { toast } from "sonner";
 import { errorToast } from "@/lib/func";
+import { useStore } from "@/app/store";
+import { useTranslation } from "../useTranslation";
 
 export function useEmotions(options?: {
   user_id?: string | undefined;
   fromDate?: number | undefined;
 }) {
-  const queryClient = useQueryClient();
+  const translate = useTranslation();
   const { user } = useFirebaseUser();
+  const queryClient = useQueryClient();
+  const messages = translate("emotion_mutation_messages");
 
   const emotionsQuery = useQuery({
     queryKey: ["emotions"],
@@ -62,7 +66,7 @@ export function useEmotions(options?: {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["emotions"] }); // рефетч
       queryClient.invalidateQueries({ queryKey: ["emotions-range"] }); // рефетч
-      toast.success("The entry has been added successfully", {
+      toast.success(messages.create, {
         className: "!bg-green-500/50 !border-green-600 !backdrop-blur-sm",
         duration: 3000,
       });
@@ -75,7 +79,7 @@ export function useEmotions(options?: {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["emotions"] }); // рефетч
       queryClient.invalidateQueries({ queryKey: ["emotions-range"] }); // рефетч
-      toast.success("The entry has been updated successfully", {
+      toast.success(messages.update, {
         className: "!bg-green-500/50 !border-green-600 !backdrop-blur-sm",
         duration: 3000,
       });
@@ -88,7 +92,7 @@ export function useEmotions(options?: {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["emotions"] }); // рефетч
       queryClient.invalidateQueries({ queryKey: ["emotions-range"] }); // рефетчфетч
-      toast.success("The entry has been deleted", {
+      toast.success(messages.delete, {
         className: "!bg-green-500/50 !border-green-600 !backdrop-blur-sm",
         duration: 3000,
       });

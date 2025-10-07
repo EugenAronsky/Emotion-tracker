@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useFirebaseUser } from "./useFirebaseUser";
+import { useFirebaseUser } from "../useFirebaseUser";
 import {
   confirmInvite,
   confirmQRCodeInvite,
@@ -11,10 +11,15 @@ import {
 import { toast } from "sonner";
 import { errorToast } from "@/lib/func";
 import { Permission } from "@/lib/type";
+import { useTranslation } from "../useTranslation";
+import { useStore } from "@/app/store";
 
 export function useInvites(options?: { permission?: string | undefined }) {
+  const { lang } = useStore();
+  const translate = useTranslation();
   const { user } = useFirebaseUser();
   const queryClient = useQueryClient();
+  const messages = translate("invites_mutation_messages");
 
   const invitesQuery = useQuery({
     queryKey: ["invites"],
@@ -42,7 +47,7 @@ export function useInvites(options?: { permission?: string | undefined }) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["invites"] });
       queryClient.invalidateQueries({ queryKey: ["collaborators"] });
-      toast.success("Congratulations! Invite has been confirmed", {
+      toast.success(messages.confirm, {
         className: "!bg-green-500/50 !border-green-600 !backdrop-blur-sm",
         duration: 3000,
       });
@@ -54,7 +59,7 @@ export function useInvites(options?: { permission?: string | undefined }) {
     mutationFn: confirmQRCodeInvite,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["invites"] });
-      toast.success("Congratulations! New collaborator has been added", {
+      toast.success(messages.confirmQRCode, {
         className: "!bg-green-500/50 !border-green-600 !backdrop-blur-sm",
         duration: 3000,
       });
@@ -66,7 +71,7 @@ export function useInvites(options?: { permission?: string | undefined }) {
     mutationFn: denyInvite,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["invites"] });
-      toast.success("Invite has been removed successfully ", {
+      toast.success(messages.deny, {
         className: "!bg-green-500/50 !border-green-600 !backdrop-blur-sm",
         duration: 3000,
       });
@@ -77,7 +82,7 @@ export function useInvites(options?: { permission?: string | undefined }) {
   const inviteCollaboratorMutation = useMutation({
     mutationFn: inviteCollaborator,
     onSuccess: ({ id }) => {
-      toast.success("Invite has been sended", {
+      toast.success(messages.send, {
         action: {
           label: "Undo",
           onClick: () => id && denyInviteMutation.mutate(id),
