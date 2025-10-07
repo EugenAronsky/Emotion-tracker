@@ -15,12 +15,8 @@ export default function LanguagePicker({
   const { lang, setLang } = useStore();
 
   useEffect(() => {
-    setLang((localStorage.getItem("emotion-tracke-lang") || "en") as Language);
-  }, []);
-
-  useEffect(() => {
     const isRTL = lang === "he";
-    localStorage.setItem("emotion-tracke-lang", lang);
+    localStorage.setItem(`${window.origin}-lang`, lang);
     document.documentElement.setAttribute("dir", isRTL ? "rtl" : "ltr");
   }, [lang]);
 

@@ -8,7 +8,12 @@ interface LanguageState {
   lang: Language;
 }
 
+const initialLang: Language =
+  typeof localStorage !== "undefined"
+    ? (localStorage.getItem(`${window.origin}-lang`) as Language) || "en"
+    : "en";
+
 export const { StoreProvider, useScopedStore, useStore } =
   createScopedStore<LanguageState>({
-    lang: "en",
+    lang: initialLang,
   });

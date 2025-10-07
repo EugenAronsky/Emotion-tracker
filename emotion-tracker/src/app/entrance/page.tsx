@@ -85,7 +85,9 @@ export default function GoogleSignInButton() {
           </div>
         ) : (
           <>
-            <h1 className="text-2xl font-bold">{translate("welcome")}</h1>
+            <h1 className="p-4 text-center text-2xl font-bold">
+              {translate("welcome")}
+            </h1>
 
             <Button
               onClick={handleGoogleSignIn}
