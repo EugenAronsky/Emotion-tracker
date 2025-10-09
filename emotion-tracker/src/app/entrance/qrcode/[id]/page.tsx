@@ -17,12 +17,11 @@ export default function QRCode() {
   const { inviteQRCodeConfirmationMutation } = useInvites();
 
   useEffect(() => {
-    if (Boolean(user) && !loading) router.push("/entrance");
-
-    if (id && Boolean(user) && !loading)
+    if (Boolean(user) && id && !loading)
       inviteQRCodeConfirmationMutation.mutate(id as string, {
         onSuccess: () => router.push("/dashboard"),
       });
+    else if (!Boolean(user) && !loading) router.push("/entrance");
   }, [id, loading, user]);
 
   return (
