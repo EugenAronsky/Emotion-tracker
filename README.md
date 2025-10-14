@@ -17,21 +17,21 @@ It helps users better understand their emotions, observe mood dynamics, and shar
 
 Emotion Tracker allows users to:
 
-- **Track emotions** and add daily notes for self-reflection.  
-- **View analytics** and observe emotional trends.  
-- **Add friends** and share personal mood statistics.  
+- **Track emotions** and add daily notes for self-reflection.
+- **View analytics** and observe emotional trends.
+- **Add friends** and share personal mood statistics.
 - **Assign roles** that define access levels for your friends:
-  - 👁 View only the current emotion  
-  - 📊 View full statistics  
-  - 📖 View all entries and notes  
+  - 👁 View only the current emotion
+  - 📊 View full statistics
+  - 📖 View all entries and notes
 
 ## ⚙️ Features
 
-- ✍️ **Emotion Journal** — save your daily emotions and notes.  
-- 📈 **Analytics Dashboard** — visualize mood dynamics and trends.  
-- 👥 **Friends and Roles** — share your statistics and control data visibility.  
-- 💬 **Collaboration** — connect with others and exchange emotional insights.  
-- 🌗 **Theme Support** — includes both light and dark modes.  
+- ✍️ **Emotion Journal** — save your daily emotions and notes.
+- 📈 **Analytics Dashboard** — visualize mood dynamics and trends.
+- 👥 **Friends and Roles** — share your statistics and control data visibility.
+- 💬 **Collaboration** — connect with others and exchange emotional insights.
+- 🌗 **Theme Support** — includes both light and dark modes.
 
 ## 🛠️ Tech Stack
 
@@ -39,43 +39,43 @@ Emotion Tracker is built with a modern front-end technology stack.
 
 ### ⚡️ Core Technologies
 
-- **Next.js 15** — React framework with SSR and routing  
-- **React 19** — modern UI library  
-- **TypeScript** — static typing for safer and scalable development  
-- **Tailwind CSS 4** — utility-first CSS framework  
-- **Shadcn UI** — accessible and customizable UI components  
-- **Lucide React** — minimal and elegant icon library  
-- **Recharts** — data visualization and analytics  
-- **React Hook Form + Zod** — form management and validation  
-- **React Query (TanStack)** — server-state management and caching  
-- **Next Themes** — light and dark theme handling  
+- **Next.js 15** — React framework with SSR and routing
+- **React 19** — modern UI library
+- **TypeScript** — static typing for safer and scalable development
+- **Tailwind CSS 4** — utility-first CSS framework
+- **Shadcn UI** — accessible and customizable UI components
+- **Lucide React** — minimal and elegant icon library
+- **Recharts** — data visualization and analytics
+- **React Hook Form + Zod** — form management and validation
+- **React Query (TanStack)** — server-state management and caching
+- **Next Themes** — light and dark theme handling
 
 ### 🔥 Additional Libraries and Utilities
 
-- **Firebase / Firebase Admin** — authentication and database management  
-- **Moment.js** — date and time handling  
-- **Html-to-Image** — exporting analytics and charts as images  
-- **React Day Picker** — date selection component  
-- **Sonner** — toast notifications  
-- **React Spinners** — loading animations  
-- **Qrcode.react** — generate QR codes  
-- **Use-Debounce** — optimized input handling  
-- **Tailwind Merge / Class Variance Authority / Clsx** — class and style management  
-- **Prettier + ESLint** — formatting and code quality control  
+- **Firebase / Firebase Admin** — authentication and database management
+- **Moment.js** — date and time handling
+- **Html-to-Image** — exporting analytics and charts as images
+- **React Day Picker** — date selection component
+- **Sonner** — toast notifications
+- **React Spinners** — loading animations
+- **Qrcode.react** — generate QR codes
+- **Use-Debounce** — optimized input handling
+- **Tailwind Merge / Class Variance Authority / Clsx** — class and style management
+- **Prettier + ESLint** — formatting and code quality control
 
 ### ☁️ Hosting & Infrastructure
 
-- **Vercel** — hosting, deployment, and CI/CD for Next.js applications  
+- **Vercel** — hosting, deployment, and CI/CD for Next.js applications
 
 ## 🚀 Installation
 
 1. **Clone the repository**:
 
    ```bash
-   git clone https://github.com/username/emotion-tracker.git
+   git clone https://github.com/EugenAronsky/Emotion-tracker.git
    cd emotion-tracker
    ```
-   
+
 2. **Install dependencies**:
 
    ```bash
@@ -87,7 +87,7 @@ Emotion Tracker is built with a modern front-end technology stack.
    ```
    NEXT_PUBLIC_FIREBASE_API_KEY=<your_firebase_api_key>
    NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=<your_firebase_auth_domain>
-   NEXT_PUBLIC_FIREBASE_PROJECT_ID=<your_firebase_project_id> 
+   NEXT_PUBLIC_FIREBASE_PROJECT_ID=<your_firebase_project_id>
    NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=<your_firebase_storage_bucket>
    NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=<your_firebase_messaging_sender_id>
    NEXT_PUBLIC_FIREBASE_APP_ID=<your_firebase_app_id>
@@ -119,14 +119,13 @@ The **Emotion Tracker** project is distributed without any restrictions.
 
 ### You are free to:
 
-* use the code for personal or commercial purposes,
-* modify and distribute the project,
-* publish your own versions,
-* and use any part of the code without attribution.
+- use the code for personal or commercial purposes,
+- modify and distribute the project,
+- publish your own versions,
+- and use any part of the code without attribution.
 
 This project is open to everyone who wants to learn, develop the idea, or use it for their own purposes.
 
 ## 📬 Contact
 
 If you have questions or suggestions, feel free to contact us at [eugenaronskiy@gmail.com](mailto:eugenaronskiy@gmail.com)
-

@@ -35,14 +35,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" style={{ colorScheme: "dark" }} suppressHydrationWarning>
+    <html
+      lang="en"
+      style={{ colorScheme: "dark" }}
+      suppressHydrationWarning
+      className="flex h-svh w-screen items-center justify-center"
+    >
       <head>
         <link rel="manifest" href="/manifest.json" />
         <link rel="icon" href="/icons/lotus.png" />
         <link rel="apple-touch-icon" href="/icons/lotus.png" />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} h-svh w-screen antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} h-full w-screen max-w-[500px] antialiased`}
       >
         <ThemeProvider
           enableSystem

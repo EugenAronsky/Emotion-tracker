@@ -1,6 +1,5 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useFirebaseUser } from "../useFirebaseUser";
 import { getAiTip } from "@/lib/controllers/gemini-controller";
+import { useQuery } from "@tanstack/react-query";
 
 export function useGemini(options?: {
   slogonQueryParams: {
@@ -8,8 +7,6 @@ export function useGemini(options?: {
     prev_context?: string | undefined;
   };
 }) {
-  const { user } = useFirebaseUser();
-
   const slogonQuery = useQuery({
     queryKey: ["slogon"],
     queryFn: () =>
